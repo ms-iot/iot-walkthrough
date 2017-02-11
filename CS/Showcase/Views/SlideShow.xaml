@@ -1,0 +1,49 @@
+﻿<Page
+    x:Class="Showcase.SlideShow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Showcase"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Name="MainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel.Resources>
+                <Storyboard x:Name="SlideShowFade">
+                    <DoubleAnimation
+                        x:Name="FadeAnimation"
+                        Storyboard.TargetName="ForegroundImage"
+                        Storyboard.TargetProperty="Opacity"
+                        From="1.0" To="0.0" Duration="0:0:3" />
+                </Storyboard>
+            </StackPanel.Resources>
+            <RelativePanel Name="ImageGrid" IsDoubleTapEnabled="False" Tapped="SlideShow_Tapped">
+                <Image x:Name="BackgroundImage" Stretch="UniformToFill" />
+                <Image x:Name="ForegroundImage" Stretch="UniformToFill" />
+                <TextBlock Text="Some news or weather here" Margin="50,50,50,50" Foreground="#FFFFFFFF" />
+                <Grid Name="SlideShowControls" RelativePanel.AlignBottomWithPanel="True" Margin="20,20,20,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0" Name="PlayPauseButton" FontFamily="Segoe MDL2 Assets" Content="&#xE769;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="Pause_Click"/>
+                    <Button Grid.Column="1" Name="SetTime" FontFamily="Segoe MDL2 Assets" Content="&#xE916;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="SetTime_Click"/>
+                    <Popup Grid.Column="1" Name="TimeDropdown" HorizontalAlignment="Left" VerticalAlignment="Top" IsLightDismissEnabled="True" VerticalOffset="-104">
+                        <ListView Background="White" BorderThickness="2.0" IsItemClickEnabled="True" IsTabStop="True" ItemClick="SetTimePopup_ItemClick">
+                            <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Height="40" Margin="0,5,0,0">
+                                <TextBlock Text="Faster image switch" VerticalAlignment="Center" Margin="20,0,20,0" />
+                            </ListViewItem>
+                            <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Height="40" Margin="0,0,0,5">
+                                <TextBlock Text="Faster transition" Margin="20,0,20,0" />
+                            </ListViewItem>
+                        </ListView>
+                    </Popup>
+                </Grid>
+            </RelativePanel>
+        </StackPanel>
+    </Grid>
+</Page>

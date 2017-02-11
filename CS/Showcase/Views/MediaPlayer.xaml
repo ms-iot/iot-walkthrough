@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="Showcase.MediaPlayer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Showcase"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Unloaded="Page_Unloaded">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <Button Click="Browse_Click" Margin="10,10,10,10">Browse folders</Button>
+            <Button Click="PlayAudio_Click" Margin="10,10,10,10">Play audio</Button>
+        </StackPanel>
+        <MediaPlayerElement Grid.Row="1" x:Name="Player" AreTransportControlsEnabled="True" />
+    </Grid>
+</Page>
