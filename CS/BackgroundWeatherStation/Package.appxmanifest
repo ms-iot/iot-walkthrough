@@ -9,14 +9,14 @@
 
   <Identity
     Name="BackgroundWeatherStation-uwp"
-    Publisher="CN=t-ticast"
+    Publisher="CN=Microsoft"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="d6095fbd-f67c-4089-976d-15bd8bb93b5c" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>BackgroundWeatherStation</DisplayName>
-    <PublisherDisplayName>t-ticast</PublisherDisplayName>
+    <PublisherDisplayName>Microsoft</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
