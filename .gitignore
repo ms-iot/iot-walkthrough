@@ -17,6 +17,7 @@
 [Rr]eleases/
 x64/
 x86/
+build/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -26,6 +27,8 @@ bld/
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
+# Roslyn cache directories
+*.ide/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -183,7 +186,10 @@ _pkginfo.txt
 !*.[Cc]ache/
 
 # Others
+sql/
+*.Cache
 ClientBin/
+[Ss]tyle[Cc]op.*
 ~$*
 *~
 *.dbmdl
@@ -231,6 +237,9 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+# Generated Files
+*.tlog
+lib.zip/
 
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
@@ -250,3 +259,5 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+# NuGet 3.0 generated files
+project.lock.json

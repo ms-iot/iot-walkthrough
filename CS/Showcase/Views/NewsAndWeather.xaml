@@ -1,0 +1,44 @@
+﻿<Page
+    x:Class="Showcase.NewsAndWeather"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Showcase"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" >
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <RelativePanel>
+            <GridView Name="ListView" ItemsSource="{x:Bind NewsGrid}" ItemClick="News_ItemClick" IsItemClickEnabled="True">
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Width="120" Height="180" Margin="5,5,5,5">
+                            <Image Width="100" Height="100" Source="{Binding Thumbnail.Source}" Margin="10,10,10,10" />
+                            <TextBlock Width="120" Height="60" Text="{Binding Name}" TextWrapping="WrapWholeWords" RelativePanel.AlignBottomWithPanel="False" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <StackPanel RelativePanel.AlignBottomWithPanel="True">
+                <StackPanel Margin="10,10,10,10">
+                    <TextBlock Text="Local weather:" Foreground="#aa888888" FontSize="20"/>
+                    <TextBlock x:Name="Temperature" Foreground="#aa888888"/>
+                    <TextBlock x:Name="Humidity" Foreground="#aa888888"/>
+                    <TextBlock x:Name="Pressure" Foreground="#aa888888"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignRightWithPanel="True">
+                <StackPanel Margin="10,10,10,10">
+                    <TextBlock Text="Outside weather:" Foreground="#aa888888" FontSize="20"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Name="OutsideIcon" Width="50" Height="50" />
+                        <TextBlock x:Name="OutsideCondition" Foreground="#aa888888" Margin="5,10,0,0" />
+                    </StackPanel>
+                    <TextBlock x:Name="OutsideTemperature" Foreground="#aa888888"/>
+                    <TextBlock x:Name="OutsideHumidity" Foreground="#aa888888"/>
+                    <TextBlock x:Name="OutsidePressure" Foreground="#aa888888"/>
+                </StackPanel>
+            </StackPanel>
+        </RelativePanel>
+    </Grid>
+</Page>

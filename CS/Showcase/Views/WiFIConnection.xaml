@@ -1,0 +1,87 @@
+﻿<Page
+    x:Class="Showcase.WiFiConnection"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Showcase"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="OnLoaded">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ResultsListViewTemplate">
+            <Grid Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" MinWidth="100"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Column="0" Grid.Row="0" Height="32" Width="32" Margin="0,5" VerticalAlignment="Top" HorizontalAlignment="Left">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="28" Text="{Binding Path=WiFiThumbnail}" />
+                </Border>
+
+                <Border Grid.Column="1" Grid.Row="0"  Margin="5">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Ssid:" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding Path=Ssid}" FontWeight="Bold" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="5">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Bssid:" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Path=Bssid}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Rssi:" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Path=Rssi}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Ch. Frequency:" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Path=ChannelCenterFrequency}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=SecuritySettings}" TextWrapping="Wrap" Margin="0,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontWeight="Bold" Text="{Binding Path=ConnectivityLevel}" TextWrapping="Wrap" Margin="0,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid Grid.Column="0" Grid.Row="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="12,20,12,50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <RelativePanel Grid.Column="0" Margin="12,12,12,12">
+                <StackPanel>
+                    <TextBlock Text="WiFi connection" FontSize="20" />
+                    <TextBlock Name="ConnectionStatusText" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Button Name="ScanButton" Click="Scan_Click" RelativePanel.AlignBottomWithPanel="True">Scan networks</Button>
+            </RelativePanel>
+            <RelativePanel Grid.Column="1">
+                <ListView x:Name="ResultsListView" ItemTemplate="{StaticResource ResultsListViewTemplate}" SelectionChanged="ResultsListView_SelectionChanged" HorizontalAlignment="Left" />
+            </RelativePanel>
+            <StackPanel x:Name="ConnectionControls" Grid.Column="2" Visibility="Collapsed" VerticalAlignment="Center" Margin="12,12,12,12">
+                <StackPanel x:Name="NetworkKeyInfo" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="Security Key:" Margin="5,0,5,0" HorizontalAlignment="Left"/>
+                    <PasswordBox x:Name="NetworkKey" Width="124" Margin="5,0,10,0" Height="23" HorizontalAlignment="Left"/>
+                </StackPanel>
+                <CheckBox Name="IsAutomaticReconnection"> Reconnect automatically</CheckBox>
+                <Button Click="Connect_Click">Connect</Button>
+            </StackPanel>
+            <WebView Source="http://www.bing.com" Grid.Column="3" Visibility="Collapsed" Name="webView" />
+        </Grid>
+    </Grid>
+</Page>
