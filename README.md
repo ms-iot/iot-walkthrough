@@ -28,7 +28,7 @@
     * Integration with Bing news
     * Showing OneDrive pictures
 6. Preparing for deployment
-    * Enabling Secure Boot, Bitlocker and the TPM module
+    * [Enabling Secure Boot, Bitlocker and the TPM module](Security/TPM/TPM.md)
     * Saving Azure keys to the TPM module
     * Provisioning an IoT image
     * Zero touch provisioning
