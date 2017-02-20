@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 
@@ -19,7 +20,16 @@ namespace Showcase
                 Debug.WriteLine("Open Weather Map returned error code " + response.StatusCode);
                 return null;
             }
-            JsonObject json = JsonObject.Parse(await response.Content.ReadAsStringAsync());
+            JsonObject json;
+            try
+            {
+                json = JsonObject.Parse(await response.Content.ReadAsStringAsync());
+            }
+            catch (COMException e)
+            {
+                Debug.WriteLine("Parsing JSON failed: " + e.Message);
+                return null;
+            }
             JsonObject mainJson = json.GetNamedObject("main");
             JsonObject weatherJson = json.GetNamedArray("weather").GetObjectAt(0);
             string description = weatherJson.GetNamedString("main") + " - " + weatherJson.GetNamedString("description");
