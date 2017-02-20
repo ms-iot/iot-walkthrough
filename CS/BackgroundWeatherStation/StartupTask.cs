@@ -14,44 +14,50 @@ namespace BackgroundWeatherStation
         private WeatherStation _station = new WeatherStation();
         private IoTHubClient _client = new IoTHubClient();
         private ThreadPoolTimer _timer;
-        private AppServiceConnection _service = AppServiceConnectionFactory.GetConnection();
+        private AppServiceConnection _service;
+        private BackgroundTaskDeferral _deferral;
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             // Get a BackgroundTaskDeferral and hold it forever if initialization is sucessful.
-            var deferral = taskInstance.GetDeferral();
-            if (!await Init())
+            _deferral = taskInstance.GetDeferral();
+            if (!await _station.InitI2c())
             {
-                deferral.Complete();
+                Debug.WriteLine("I2C initialization failed");
+                _deferral.Complete();
                 return;
             }
 
-            _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
+            taskInstance.Canceled += (IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) =>
             {
-                Debug.WriteLine("Request callback received");
+                Debug.WriteLine("Cancelled: reason " + reason);
             };
-            _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
-            {
-                Debug.WriteLine("Service closed: " + args.Status);
-                deferral.Complete();
-            };
+            await TryOpenService();
 
             _timer = ThreadPoolTimer.CreatePeriodicTimer(LogSensorData, TimeSpan.FromSeconds(5));
         }
 
-        private async Task<bool> Init()
+        private async Task<bool> TryOpenService()
         {
-            if (!await _station.InitI2c())
+            if (_service == null)
             {
-                Debug.WriteLine("I2C initialization failed");
-                return false;
-            }
-
-            var serviceStatus = await _service.OpenAsync();
-            if (serviceStatus != AppServiceConnectionStatus.Success)
-            {
-                Debug.WriteLine("Opening service failed: " + serviceStatus);
-                return false;
+                _service = AppServiceConnectionFactory.GetConnection();
+                var serviceStatus = await _service.OpenAsync();
+                if (serviceStatus != AppServiceConnectionStatus.Success)
+                {
+                    Debug.WriteLine("Opening service failed: " + serviceStatus);
+                    _service = null;
+                    return false;
+                }
+                _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
+                {
+                    Debug.WriteLine("Request callback received");
+                };
+                _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
+                {
+                    Debug.WriteLine("Service closed: " + args.Status);
+                    _service = null;
+                };
             }
             return true;
         }
@@ -62,13 +68,17 @@ namespace BackgroundWeatherStation
             var humidity = _station.ReadHumidity();
             var pressure = _station.ReadPressure();
 
-            _client.LogData(temperature, humidity, pressure);
+            _client.LogDataAsync(temperature, humidity, pressure);
 
-            ValueSet message = new ValueSet();
-            message["temperature"] = temperature;
-            message["humidity"] = humidity;
-            message["pressure"] = pressure;
-            await _service.SendMessageAsync(message);
+            if (await TryOpenService())
+            {
+                ValueSet message = new ValueSet();
+                message["temperature"] = temperature;
+                message["humidity"] = humidity;
+                message["pressure"] = pressure;
+                await _service.SendMessageAsync(message);
+            }
+            Debug.WriteLine("Logged data");
         }
     }
 }
