@@ -1,8 +1,5 @@
-﻿using ShowcaseBridgeService;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation.Collections;
 using Windows.System.Threading;
@@ -14,7 +11,6 @@ namespace BackgroundWeatherStation
         private WeatherStation _station = new WeatherStation();
         private IoTHubClient _client = new IoTHubClient();
         private ThreadPoolTimer _timer;
-        private AppServiceConnection _service;
         private BackgroundTaskDeferral _deferral;
 
         public async void Run(IBackgroundTaskInstance taskInstance)
@@ -32,34 +28,8 @@ namespace BackgroundWeatherStation
             {
                 Debug.WriteLine("Cancelled: reason " + reason);
             };
-            await TryOpenService();
 
             _timer = ThreadPoolTimer.CreatePeriodicTimer(LogSensorData, TimeSpan.FromSeconds(5));
-        }
-
-        private async Task<bool> TryOpenService()
-        {
-            if (_service == null)
-            {
-                _service = AppServiceConnectionFactory.GetConnection();
-                var serviceStatus = await _service.OpenAsync();
-                if (serviceStatus != AppServiceConnectionStatus.Success)
-                {
-                    Debug.WriteLine("Opening service failed: " + serviceStatus);
-                    _service = null;
-                    return false;
-                }
-                _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
-                {
-                    Debug.WriteLine("Request callback received");
-                };
-                _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
-                {
-                    Debug.WriteLine("Service closed: " + args.Status);
-                    _service = null;
-                };
-            }
-            return true;
         }
 
         private async void LogSensorData(ThreadPoolTimer timer)
@@ -70,14 +40,12 @@ namespace BackgroundWeatherStation
 
             _client.LogDataAsync(temperature, humidity, pressure);
 
-            if (await TryOpenService())
-            {
-                ValueSet message = new ValueSet();
-                message["temperature"] = temperature;
-                message["humidity"] = humidity;
-                message["pressure"] = pressure;
-                await _service.SendMessageAsync(message);
-            }
+            ValueSet message = new ValueSet();
+            message["temperature"] = temperature;
+            message["humidity"] = humidity;
+            message["pressure"] = pressure;
+            await AppServiceBridge.SendMessageAsync(message);
+
             Debug.WriteLine("Logged data");
         }
     }

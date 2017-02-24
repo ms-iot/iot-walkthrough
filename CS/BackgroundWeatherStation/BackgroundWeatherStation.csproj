@@ -96,8 +96,8 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppServiceBridge.cs" />
     <Compile Include="IoTHubClient.cs" />
-    <Compile Include="Keys.cs" />
     <Compile Include="StartupTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WeatherStation.cs" />
