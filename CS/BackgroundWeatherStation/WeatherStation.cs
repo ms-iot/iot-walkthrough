@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.Devices.I2c;
 
@@ -37,7 +38,17 @@ namespace BackgroundWeatherStation
 
             htu21d = Open(controller, Htu21dDefinitions.ADDRESS);
             mpl3115a2 = Open(controller, Mpl3115a2Definitions.ADDRESS);
-            if (WriteRead8(mpl3115a2, Mpl3115a2Definitions.WHO_AM_I) != Mpl3115a2Definitions.WHO_AM_I_ID)
+            int who_am_i_id;
+            try
+            {
+                who_am_i_id = WriteRead8(mpl3115a2, Mpl3115a2Definitions.WHO_AM_I);
+            }
+            catch (FileNotFoundException)
+            {
+                // First I2C operation might fail if some slave was in a bad state
+                who_am_i_id = WriteRead8(mpl3115a2, Mpl3115a2Definitions.WHO_AM_I);
+            }
+            if (who_am_i_id != Mpl3115a2Definitions.WHO_AM_I_ID)
             {
                 Debug.WriteLine("MP13115A2 fails WHO_AM_I test");
                 return false;

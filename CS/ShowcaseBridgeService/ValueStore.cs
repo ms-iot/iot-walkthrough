@@ -26,7 +26,7 @@ namespace ShowcaseBridgeService
                 _configs[element.Key] = element.Value;
             }
             ValueChangedEventArgs args = new ValueChangedEventArgs(settings);
-            ValueChanged(this, args);
+            ValueChanged?.Invoke(this, args);
         }
 
         public object GetSetting(String key)

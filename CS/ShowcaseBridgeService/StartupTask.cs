@@ -14,22 +14,18 @@ namespace ShowcaseBridgeService
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
-            _deferral = taskInstance.GetDeferral();
+            taskInstance.Canceled += OnTaskCanceled;
             Debug.WriteLine("ShowcaseBridgeService FamilyName: " + Windows.ApplicationModel.Package.Current.Id.FamilyName);
 
             if (_store == null)
             {
                 _store = new ValueStore();
+                _store.ValueChanged += BroadcastReceivedMessage;
             }
 
             if (SetupConnection(taskInstance.TriggerDetails as AppServiceTriggerDetails))
             {
-                taskInstance.Canceled += OnTaskCanceled;
-                _store.ValueChanged += BroadcastReceivedMessage;
-            }
-            else
-            {
-                _deferral.Complete();
+                _deferral = taskInstance.GetDeferral();
             }
         }
 

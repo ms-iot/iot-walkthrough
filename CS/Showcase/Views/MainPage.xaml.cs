@@ -35,6 +35,11 @@ namespace Showcase
             voiceRecognitionTask.recognitionCallback += VoiceCommandCallback;
             Unloaded += MainPage_Unloaded;
             TTS("Welcome");
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            await AppServiceBridge.InitAsync();
             ContentFrame.Navigate(typeof(NewsAndWeather));
         }
 
