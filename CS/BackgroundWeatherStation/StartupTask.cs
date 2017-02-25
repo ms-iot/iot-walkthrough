@@ -23,6 +23,7 @@ namespace BackgroundWeatherStation
                 _deferral.Complete();
                 return;
             }
+            await _client.InitAsync();
 
             taskInstance.Canceled += (IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) =>
             {

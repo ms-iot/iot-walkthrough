@@ -19,14 +19,27 @@ namespace BackgroundWeatherStation
         private DeviceClient _deviceClient;
         private String _id;
 
-        public IoTHubClient()
+        public async Task InitAsync()
         {
             _id = _tpm.GetDeviceId();
-            RefreshToken();
+            if (String.IsNullOrEmpty(_id))
+            {
+                Debug.WriteLine("TPM keys have not been provisioned, ignoring Azure calls");
+                _id = null;
+            }
+            else
+            {
+                await RefreshToken();
+            }
         }
 
         public async void LogDataAsync(double temperature, double humidity, double pressure)
         {
+            if (_id == null)
+            {
+                Debug.WriteLine("TPM keys have not been provisioned, ignoring Azure calls");
+                return;
+            }
             var messageString = new JsonObject
             {
                 { "currentTemperature", JsonValue.CreateNumberValue(temperature) },
