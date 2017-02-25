@@ -16,7 +16,8 @@
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Showcase_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Showcase_StoreKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>F50A502289CBFC36D13E5590F308A88A22347EF6</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -95,10 +96,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AppServiceBridge.cs" />
     <Compile Include="BingNews.cs" />
     <Compile Include="IoTHubClient.cs" />
     <Compile Include="NewsModel.cs" />
     <Compile Include="Keys.cs" />
+    <Compile Include="OneDriveItemController.cs" />
+    <Compile Include="OneDriveItemModel.cs" />
     <Compile Include="OpenWeatherMap.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -130,9 +134,11 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="Showcase_StoreKey.pfx" />
     <None Include="Showcase_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
