@@ -1,8 +1,5 @@
-﻿using ShowcaseBridgeService;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -17,12 +14,12 @@ namespace Showcase
     /// </summary>
     public sealed partial class NewsAndWeather : Page
     {
-        public ObservableCollection<NewsModel> NewsGrid { get { return this.news; } }
+        public ObservableCollection<NewsModel> NewsGrid { get { return _news; } }
 
-        private ObservableCollection<NewsModel> news = new ObservableCollection<NewsModel>();
-        private AppServiceConnection _service = AppServiceConnectionFactory.GetConnection();
+        private ObservableCollection<NewsModel> _news = new ObservableCollection<NewsModel>();
         private CoreDispatcher uiThreadDispatcher = null;
         private DispatcherTimer weatherTimer = new DispatcherTimer();
+        private BingNews _bing = new BingNews();
 
         public NewsAndWeather()
         {
@@ -31,22 +28,23 @@ namespace Showcase
 
             weatherTimer.Tick += (object sender, object e) => { UpdateWeather(); };
             weatherTimer.Interval = TimeSpan.FromSeconds(20);
-            weatherTimer.Start();
+
+            _bing.NewsUpdate += NewsUpdate;
+            _bing.Init();
 
             UpdateWeather();
-            ConnectToAppService();
-            ShowNews();
         }
 
-        private async void ConnectToAppService()
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) => {
-                Debug.WriteLine("Request received!");
-            };
-            var status = await _service.OpenAsync();
-            Debug.WriteLine("Status: " + status);
-            Debug.Assert(status == AppServiceConnectionStatus.Success);
-            _service.RequestReceived += Connection_RequestReceived;
+            weatherTimer.Start();
+            AppServiceBridge.Service.RequestReceived += Connection_RequestReceived;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            weatherTimer.Stop();
+            AppServiceBridge.Service.RequestReceived -= Connection_RequestReceived;
         }
 
         private async void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -72,24 +70,16 @@ namespace Showcase
             });
         }
 
-        private async void ShowNews()
+        private async void NewsUpdate(object sender, EventArgs args)
         {
-            BingNews bing = new BingNews();
-            List<NewsModel> bingNews;
-            try
-            {
-                bingNews = await bing.GetNews();
-            }
-            catch (System.Net.Http.HttpRequestException)
-            {
-                Debug.WriteLine("Could not contact Bing server");
-                return;
-            }
-            news.Clear();
-            foreach (var n in bingNews)
-            {
-                news.Add(n);
-            }
+            BingNews.NewsUpdateEventArgs news = (BingNews.NewsUpdateEventArgs)args;
+            await uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                _news.Clear();
+                foreach (var x in news.UpdatedNews)
+                {
+                    _news.Add(x);
+                }
+            });
         }
 
         private void News_ItemClick(object sender, ItemClickEventArgs e)
