@@ -37,7 +37,7 @@ namespace BackgroundWeatherStation
         {
             if (_id == null)
             {
-                Debug.WriteLine("TPM keys have not been provisioned, ignoring Azure calls");
+                Debug.WriteLine("Not connected to Azure, ignoring telemetry logging calls");
                 return;
             }
             var messageString = new JsonObject
@@ -75,7 +75,17 @@ namespace BackgroundWeatherStation
             _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt);
 
             // FIXME race condition
-            await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
+            try
+            {
+                await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception connecting to Azure: " + e.Message);
+                // FIXME should not prevent all future connections if it fails once
+                _id = null;
+                return;
+            }
             var twin = await _deviceClient.GetTwinAsync();
             await OnDesiredPropertyChanged(twin.Properties.Desired, null);
         }

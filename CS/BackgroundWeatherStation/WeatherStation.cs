@@ -38,6 +38,11 @@ namespace BackgroundWeatherStation
 
             htu21d = Open(controller, Htu21dDefinitions.ADDRESS);
             mpl3115a2 = Open(controller, Mpl3115a2Definitions.ADDRESS);
+            if (htu21d == null || mpl3115a2 == null)
+            {
+                Debug.WriteLine("Failed to open I2C device. Make sure the bus is not in use.");
+                return false;
+            }
             int who_am_i_id;
             try
             {

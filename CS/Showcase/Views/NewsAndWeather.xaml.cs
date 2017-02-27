@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -38,36 +39,40 @@ namespace Showcase
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             weatherTimer.Start();
-            AppServiceBridge.Service.RequestReceived += Connection_RequestReceived;
+            AppServiceBridge.RequestReceived += Connection_RequestReceived;
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             weatherTimer.Stop();
-            AppServiceBridge.Service.RequestReceived -= Connection_RequestReceived;
+            AppServiceBridge.RequestReceived -= Connection_RequestReceived;
         }
 
         private async void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             ValueSet message = args.Request.Message;
-            await uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
-                object temperature, humidity, pressure;
 
-                if (message.TryGetValue("temperature", out temperature))
-                {
-                    Temperature.Text = FormatTemperature((double)temperature);
-                }
+            Debug.WriteLine("RequestReceived");
 
-                if (message.TryGetValue("humidity", out humidity))
-                {
-                    Humidity.Text = FormatHumidity((double)humidity);
-                }
+            if (message.TryGetValue("temperature", out object temperature) | message.TryGetValue("humidity", out object humidity) | message.TryGetValue("pressure", out object pressure))
+            {
+                await uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    if (temperature != null)
+                    {
+                        Temperature.Text = FormatTemperature((double)temperature);
+                    }
 
-                if (message.TryGetValue("pressure", out pressure))
-                {
-                    Pressure.Text = FormatPressure((double)pressure);
-                }
-            });
+                    if (humidity != null)
+                    {
+                        Humidity.Text = FormatHumidity((double)humidity);
+                    }
+
+                    if (pressure != null)
+                    {
+                        Pressure.Text = FormatPressure((double)pressure);
+                    }
+                });
+            }
         }
 
         private async void NewsUpdate(object sender, EventArgs args)
