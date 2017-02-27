@@ -19,7 +19,7 @@ namespace Showcase
                 _service = AppServiceConnectionFactory.GetConnection();
                 _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
                 {
-                    RequestReceived(sender, args);
+                    RequestReceived?.Invoke(sender, args);
                 };
                 _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
                 {
