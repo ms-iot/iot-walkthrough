@@ -15,7 +15,7 @@ To connect the sensor to the DragonBoard, a level shifter will be necessary. The
 The Fritzing project with the connections [can be downloaded here](Wiring.fzz).
 ![Breadboard wiring](Wiring.png)
 
-* The GND signals of both boards are connected.
-* On the DragonBoard side, LV is connected to 1.8V, and A1 and A2 are connected to SCL and SDA, respectively.
-* On the weather shield side, HV is connected to 5V, and B1 and B2 are connected to SCL and SDA, respectively.
-* The DragonBoard's 5V output is connected to 5V and VIN of the weather shield.
+* The *GND* signals of both boards are connected.
+* On the DragonBoard side, *LV* is connected to *1.8V*, and *A1* and *A2* are connected to *SCL* and *SDA*, respectively.
+* On the weather shield side, *HV* is connected to *5V*, and *B1* and *B2* are connected to *SCL* and *SDA*, respectively.
+* The DragonBoard's *5V* output is connected to *5V* and *VIN* of the weather shield.
