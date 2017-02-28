@@ -52,8 +52,6 @@ namespace Showcase
         {
             ValueSet message = args.Request.Message;
 
-            Debug.WriteLine("RequestReceived");
-
             if (message.TryGetValue("temperature", out object temperature) | message.TryGetValue("humidity", out object humidity) | message.TryGetValue("pressure", out object pressure))
             {
                 await uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
