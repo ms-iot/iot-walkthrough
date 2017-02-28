@@ -65,16 +65,14 @@ namespace Showcase
 
         private async void FetchNews()
         {
-            HttpClient client = new HttpClient();
-            List<NewsModel> news = new List<NewsModel>();
-            var response = await client.SendAsync(BuildRequest());
-            if (!response.IsSuccessStatusCode)
+            JsonObject json = await new HttpHelper(BuildRequest()).GetJsonAsync();
+            if (json == null)
             {
-                Debug.WriteLine("Bing news returned error code " + response.StatusCode);
                 return;
             }
-            JsonObject json = JsonObject.Parse(await response.Content.ReadAsStringAsync());
-            JsonArray jsonNews = json.GetNamedArray("value");
+
+            var jsonNews = json.GetNamedArray("value");
+            var news = new List<NewsModel>();
             foreach (var x in jsonNews)
             {
                 news.Add(NewsFromJsonObject(x.GetObject()));
