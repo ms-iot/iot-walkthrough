@@ -6,8 +6,6 @@ namespace Showcase
 {
     public class OneDriveItemModel : INotifyPropertyChanged
     {
-        private BitmapSource bitmap;
-
         public OneDriveItemModel(Item item)
         {
             this.Item = item;
@@ -17,7 +15,7 @@ namespace Showcase
         {
             get
             {
-                return this.Item == null ? null : this.Item.Id;
+                return Item == null ? null : this.Item.Id;
             }
         }
 

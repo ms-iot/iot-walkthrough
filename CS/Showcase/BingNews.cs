@@ -28,14 +28,13 @@ namespace Showcase
 
         public void Init()
         {
-            AppServiceBridge.Service.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestReceived += PropertyUpdate;
             AppServiceBridge.RequestUpdate("bingKey");
         }
 
         private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
-            object key;
-            args.Request.Message.TryGetValue("bingKey", out key);
+            args.Request.Message.TryGetValue("bingKey", out object key);
             if (key != null)
             {
                 _key = (string)key;

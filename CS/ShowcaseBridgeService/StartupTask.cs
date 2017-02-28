@@ -6,21 +6,33 @@ using Windows.Foundation.Collections;
 
 namespace ShowcaseBridgeService
 {
+    class ValueChangedEventArgs : EventArgs
+    {
+        private ValueSet _changedValues;
+
+        public ValueChangedEventArgs(ValueSet changedValues)
+        {
+            _changedValues = changedValues;
+        }
+
+        public ValueSet ChangedValues { get { return _changedValues; } }
+    }
+
     public sealed class StartupTask : IBackgroundTask
     {
         private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
-        private static ValueStore _store;
+        private static ValueSet _valueStore;
+        private static EventHandler ValueChanged;
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
             taskInstance.Canceled += OnTaskCanceled;
             Debug.WriteLine("ShowcaseBridgeService FamilyName: " + Windows.ApplicationModel.Package.Current.Id.FamilyName);
 
-            if (_store == null)
+            if (_valueStore == null)
             {
-                _store = new ValueStore();
-                _store.ValueChanged += BroadcastReceivedMessage;
+                _valueStore = new ValueSet();
             }
 
             if (SetupConnection(taskInstance.TriggerDetails as AppServiceTriggerDetails))
@@ -44,16 +56,24 @@ namespace ShowcaseBridgeService
             Debug.WriteLine("New service connection");
             _connection = triggerDetails.AppServiceConnection;
             _connection.RequestReceived += OnRequestReceived;
+            ValueChanged += BroadcastReceivedMessage;
+
             return true;
         }
 
         private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
            Debug.WriteLine("Cancellation, reason: " + reason);
+           ValueChanged -= BroadcastReceivedMessage;
            if (_deferral != null)
-            {
-                _deferral.Complete();
-            }
+           {
+               _deferral.Complete();
+           }
+        }
+
+        private async void BroadcastReceivedMessage(object sender, EventArgs args)
+        {
+            await _connection.SendMessageAsync(((ValueChangedEventArgs)args).ChangedValues);
         }
 
         private async void OnRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -65,28 +85,24 @@ namespace ShowcaseBridgeService
             {
                 if (element.Value != null)
                 {
+                    _valueStore[element.Key] = element.Value;
                     values.Add(element.Key, element.Value);
                 }
                 else
                 {
                     var key = element.Key;
-                    requestedValues.Add(key, _store.GetSetting(key));
+                    _valueStore.TryGetValue(key, out object value);
+                    requestedValues.Add(key, value);
                 }
             }
             if (values.Count != 0)
             {
-                _store.SetSettings(values);
+                ValueChanged?.Invoke(this, new ValueChangedEventArgs(values));
             }
             if (requestedValues.Count != 0)
             {
                 await _connection.SendMessageAsync(requestedValues);
             }
-        }
-
-        private async void BroadcastReceivedMessage(object sender, EventArgs args)
-        {
-            var changedArgs = args as ValueChangedEventArgs;
-            await _connection.SendMessageAsync(changedArgs.ChangedValues);
         }
     }
 }

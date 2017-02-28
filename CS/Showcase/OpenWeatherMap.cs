@@ -14,7 +14,16 @@ namespace Showcase
         public async Task<WeatherModel> GetWeather()
         {
             HttpClient client = new HttpClient();
-            var response = await client.SendAsync(BuildRequest());
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.SendAsync(BuildRequest());
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Open Weather Map SendAsync error: " + e.Message);
+                return null;
+            }
             if (!response.IsSuccessStatusCode)
             {
                 Debug.WriteLine("Open Weather Map returned error code " + response.StatusCode);

@@ -24,7 +24,7 @@ namespace BackgroundWeatherStation
             _id = _tpm.GetDeviceId();
             if (String.IsNullOrEmpty(_id))
             {
-                Debug.WriteLine("TPM keys have not been provisioned, ignoring Azure calls");
+                Debug.WriteLine("TPM keys not provisioned, ignoring Azure calls");
                 _id = null;
             }
             else
@@ -37,7 +37,11 @@ namespace BackgroundWeatherStation
         {
             if (_id == null)
             {
-                Debug.WriteLine("TPM keys have not been provisioned, ignoring Azure calls");
+                Debug.WriteLine("TPM keys not provisioned, ignoring telemetry logging calls");
+                return;
+            }
+            if (_deviceClient == null && !await RefreshToken())
+            {
                 return;
             }
             var messageString = new JsonObject
@@ -69,15 +73,26 @@ namespace BackgroundWeatherStation
             }
         }
 
-        private async Task RefreshToken()
+        private async Task<bool> RefreshToken()
         {
             var method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
-            _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt);
+            Twin twin;
 
+            try
+            {
+                _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt);
+                await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
+                twin = await _deviceClient.GetTwinAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception connecting to Azure: " + e.Message);
+                _deviceClient = null;
+                return false;
+            }
             // FIXME race condition
-            await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
-            var twin = await _deviceClient.GetTwinAsync();
             await OnDesiredPropertyChanged(twin.Properties.Desired, null);
+            return true;
         }
 
         private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)

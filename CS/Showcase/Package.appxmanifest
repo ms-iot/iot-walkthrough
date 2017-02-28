@@ -3,7 +3,6 @@
   <Identity Name="19434TiagoShibata.devex-showcase" Publisher="CN=E02CCD87-E879-4330-9A1C-4CBD792A160A" Version="1.1.0.0" />
   <mp:PhoneIdentity PhoneProductId="781c076e-408d-44a8-af4c-1840c9e94810" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>Showcase</DisplayName>
     <DisplayName>devex-showcase</DisplayName>
     <PublisherDisplayName>Microsoft</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
