@@ -35,17 +35,20 @@ namespace Showcase
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            AppServiceBridge.RequestReceived += Connection_RequestReceived;
+            AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate("temperature");
+            AppServiceBridge.RequestUpdate("humidity");
+            AppServiceBridge.RequestUpdate("pressure");
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             _bing.Stop();
             _weather.Stop();
-            AppServiceBridge.RequestReceived -= Connection_RequestReceived;
+            AppServiceBridge.RequestReceived -= PropertyUpdate;
         }
 
-        private async void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             ValueSet message = args.Request.Message;
 
