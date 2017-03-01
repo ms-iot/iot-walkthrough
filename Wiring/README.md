@@ -1,3 +1,5 @@
+---
+---
 # Wiring of weather shield to DragonBoard 410c
 
 ### Introduction
