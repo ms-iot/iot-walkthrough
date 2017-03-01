@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -19,32 +18,30 @@ namespace Showcase
 
         private ObservableCollection<NewsModel> _news = new ObservableCollection<NewsModel>();
         private CoreDispatcher uiThreadDispatcher = null;
-        private DispatcherTimer weatherTimer = new DispatcherTimer();
         private BingNews _bing = new BingNews();
+        private OpenWeatherMap _weather = new OpenWeatherMap();
 
         public NewsAndWeather()
         {
             this.InitializeComponent();
             uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 
-            weatherTimer.Tick += (object sender, object e) => { UpdateWeather(); };
-            weatherTimer.Interval = TimeSpan.FromSeconds(20);
-
             _bing.NewsUpdate += NewsUpdate;
-            _bing.Init();
+            _bing.Start();
 
-            UpdateWeather();
+            _weather.WeatherUpdate += WeatherUpdate;
+            _weather.Start();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            weatherTimer.Start();
             AppServiceBridge.RequestReceived += Connection_RequestReceived;
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            weatherTimer.Stop();
+            _bing.Stop();
+            _weather.Stop();
             AppServiceBridge.RequestReceived -= Connection_RequestReceived;
         }
 
@@ -91,18 +88,17 @@ namespace Showcase
             Frame.Navigate(typeof(WebViewPage), news.Url);
         }
 
-        private async void UpdateWeather()
+        private async void WeatherUpdate(object sender, EventArgs args)
         {
-            var weatherProvider = new OpenWeatherMap();
-            var weather = await weatherProvider.GetWeather();
-            if (weather != null)
+            WeatherModel weather = ((OpenWeatherMap.WeatherUpdateEventArgs)args).UpdatedWeather;
+            await uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 OutsideIcon.Source = new BitmapImage(new Uri(weather.Icon));
                 OutsideCondition.Text = weather.Condition;
                 OutsideTemperature.Text = FormatTemperature(weather.Temperature);
                 OutsideHumidity.Text = FormatHumidity(weather.Humidity);
                 OutsidePressure.Text = FormatPressure(weather.Pressure);
-            }
+            });
         }
 
         private string FormatTemperature(double temperature)
