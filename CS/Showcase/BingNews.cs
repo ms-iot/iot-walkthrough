@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http;
 using Windows.ApplicationModel.AppService;
 using Windows.Data.Json;
@@ -13,6 +12,8 @@ namespace Showcase
         private const String ENDPOINT = "https://api.cognitive.microsoft.com/bing/v5.0/news/";
         private string _key;
         private ThreadPoolTimer _timer;
+        private object _timerLock = new object();
+        private bool _started;
 
         public class NewsUpdateEventArgs : EventArgs
         {
@@ -26,10 +27,43 @@ namespace Showcase
             public List<NewsModel> UpdatedNews { get { return _updatedNews; } }
         }
 
-        public void Init()
+        public BingNews()
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
             AppServiceBridge.RequestUpdate("bingKey");
+        }
+
+        public void Start()
+        {
+            _started = true;
+            InitTimer();
+        }
+
+        public void Stop()
+        {
+            _started = false;
+            lock (_timerLock)
+            {
+                if (_timer != null)
+                {
+                    _timer.Cancel();
+                }
+            }
+        }
+
+        private void InitTimer()
+        {
+            lock (_timerLock)
+            {
+                if (_started && _timer == null && _key != null)
+                {
+                    _timer = ThreadPoolTimer.CreatePeriodicTimer((ThreadPoolTimer timer) =>
+                    {
+                        FetchNews();
+                    }, TimeSpan.FromMinutes(5));
+                    FetchNews();
+                }
+            }
         }
 
         private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -38,14 +72,7 @@ namespace Showcase
             if (key != null)
             {
                 _key = (string)key;
-                if (_timer == null)
-                {
-                    _timer = ThreadPoolTimer.CreatePeriodicTimer((ThreadPoolTimer timer) =>
-                    {
-                        FetchNews();
-                    }, TimeSpan.FromMinutes(5));
-                    FetchNews();
-                }
+                InitTimer();
             }
         }
 
@@ -65,16 +92,14 @@ namespace Showcase
 
         private async void FetchNews()
         {
-            HttpClient client = new HttpClient();
-            List<NewsModel> news = new List<NewsModel>();
-            var response = await client.SendAsync(BuildRequest());
-            if (!response.IsSuccessStatusCode)
+            JsonObject json = await new HttpHelper(BuildRequest()).GetJsonAsync();
+            if (json == null)
             {
-                Debug.WriteLine("Bing news returned error code " + response.StatusCode);
                 return;
             }
-            JsonObject json = JsonObject.Parse(await response.Content.ReadAsStringAsync());
-            JsonArray jsonNews = json.GetNamedArray("value");
+
+            var jsonNews = json.GetNamedArray("value");
+            var news = new List<NewsModel>();
             foreach (var x in jsonNews)
             {
                 news.Add(NewsFromJsonObject(x.GetObject()));

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Devices.I2c;
@@ -27,21 +26,19 @@ namespace BackgroundWeatherStation
 
         private I2cDevice htu21d, mpl3115a2;
 
-        public async Task<bool> InitI2c()
+        public async Task InitAsync()
         {
             var controller = await I2cController.GetDefaultAsync();
             if (controller == null)
             {
-                Debug.WriteLine("No I2C controller found");
-                return false;
+                throw new Exception("No I2C controller found");
             }
 
-            htu21d = Open(controller, Htu21dDefinitions.ADDRESS);
-            mpl3115a2 = Open(controller, Mpl3115a2Definitions.ADDRESS);
+            htu21d = controller.GetDevice(new I2cConnectionSettings(Htu21dDefinitions.ADDRESS));
+            mpl3115a2 = controller.GetDevice(new I2cConnectionSettings(Mpl3115a2Definitions.ADDRESS));
             if (htu21d == null || mpl3115a2 == null)
             {
-                Debug.WriteLine("Failed to open I2C device. Make sure the bus is not in use.");
-                return false;
+                throw new Exception("Failed to open I2C device. Make sure the bus is not in use.");
             }
             int who_am_i_id;
             try
@@ -55,14 +52,12 @@ namespace BackgroundWeatherStation
             }
             if (who_am_i_id != Mpl3115a2Definitions.WHO_AM_I_ID)
             {
-                Debug.WriteLine("MP13115A2 fails WHO_AM_I test");
-                return false;
+                throw new Exception("MP13115A2 fails WHO_AM_I test");
             }
             // 0x39 = barometer mode, oversampling of 128 samples, ACTIVE mode
             // For a full list of flags, see page 33 of the datasheet
             byte[] activateCmd = { Mpl3115a2Definitions.CTRL_REG1, 0x39 };
             mpl3115a2.Write(activateCmd);
-            return true;
         }
 
         public double ReadTemperature()
@@ -88,11 +83,6 @@ namespace BackgroundWeatherStation
             /// </summary>
             int rawReading = WriteRead24(mpl3115a2, Mpl3115a2Definitions.PRESSURE_COMMAND);
             return (rawReading >> 6) + ((rawReading >> 4) & 3) / 4.0;
-        }
-
-        private I2cDevice Open(I2cController controller, int address)
-        {
-            return controller.GetDevice(new I2cConnectionSettings(address));
         }
 
         private int WriteRead24(I2cDevice sensor, byte[] command)

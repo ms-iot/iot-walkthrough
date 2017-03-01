@@ -98,7 +98,7 @@
     </Compile>
     <Compile Include="AppServiceBridge.cs" />
     <Compile Include="BingNews.cs" />
-    <Compile Include="IoTHubClient.cs" />
+    <Compile Include="HttpHelper.cs" />
     <Compile Include="NewsModel.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="OneDriveItemController.cs" />

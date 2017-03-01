@@ -17,9 +17,13 @@ namespace BackgroundWeatherStation
         {
             // Get a BackgroundTaskDeferral and hold it forever if initialization is sucessful.
             _deferral = taskInstance.GetDeferral();
-            if (!await _station.InitI2c())
+            try
             {
-                Debug.WriteLine("I2C initialization failed");
+                await _station.InitAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("I2C initialization failed: " + e.Message);
                 _deferral.Complete();
                 return;
             }

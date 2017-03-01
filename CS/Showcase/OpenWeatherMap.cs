@@ -1,57 +1,118 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net.Http;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using Windows.ApplicationModel.AppService;
 using Windows.Data.Json;
+using Windows.System.Threading;
 
 namespace Showcase
 {
     class OpenWeatherMap
     {
         private const String ENDPOINT = "http://api.openweathermap.org/data/2.5/weather";
+        private ThreadPoolTimer _timer;
+        private object _timerLock = new object();
+        // Properties
+        private string _zip;
+        private string _country;
+        private string _key;
+        private bool _started;
 
-        public async Task<WeatherModel> GetWeather()
+        public class WeatherUpdateEventArgs : EventArgs
         {
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response;
-            try
+            private WeatherModel _updatedWeather;
+
+            public WeatherUpdateEventArgs(WeatherModel updatedWeather)
             {
-                response = await client.SendAsync(BuildRequest());
+                _updatedWeather = updatedWeather;
             }
-            catch (Exception e)
+
+            public WeatherModel UpdatedWeather { get { return _updatedWeather; } }
+        }
+
+        public OpenWeatherMap()
+        {
+            AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate("OpenWeatherMapKey");
+            AppServiceBridge.RequestUpdate("OpenWeatherMapZip");
+            AppServiceBridge.RequestUpdate("OpenWeatherMapCountry");
+        }
+
+        public void Start()
+        {
+            _started = true;
+            InitTimer();
+        }
+
+        public void Stop()
+        {
+            _started = false;
+            lock (_timerLock)
             {
-                Debug.WriteLine("Open Weather Map SendAsync error: " + e.Message);
-                return null;
+                if (_timer != null)
+                {
+                    _timer.Cancel();
+                }
             }
-            if (!response.IsSuccessStatusCode)
+        }
+
+        private void InitTimer()
+        {
+            lock (_timerLock)
             {
-                Debug.WriteLine("Open Weather Map returned error code " + response.StatusCode);
-                return null;
+                if (_started && _timer == null && _zip != null && _country != null && _key != null)
+                {
+                    _timer = ThreadPoolTimer.CreatePeriodicTimer((ThreadPoolTimer timer) =>
+                    {
+                        FetchWeather();
+                    }, TimeSpan.FromMinutes(5));
+                    FetchWeather();
+                }
             }
-            JsonObject json;
-            try
+        }
+
+        private bool TryUpdate(AppServiceRequestReceivedEventArgs args, string key, ref string output)
+        {
+            args.Request.Message.TryGetValue(key, out object value);
+            if (value != null)
             {
-                json = JsonObject.Parse(await response.Content.ReadAsStringAsync());
+                output = (string)value;
+                return true;
             }
-            catch (COMException e)
+            return false;
+        }
+
+        private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            // If some value was changed, set timer to update weather
+            if (TryUpdate(args, "OpenWeatherMapZip", ref _zip) | TryUpdate(args, "OpenWeatherMapCountry", ref _country) | TryUpdate(args, "OpenWeatherMapKey", ref _key))
             {
-                Debug.WriteLine("Parsing JSON failed: " + e.Message);
-                return null;
+                InitTimer();
             }
+        }
+
+        private async void FetchWeather()
+        {
+            JsonObject json = await new HttpHelper(BuildRequest()).GetJsonAsync();
+            if (json == null)
+            {
+                return;
+            }
+
             JsonObject mainJson = json.GetNamedObject("main");
             JsonObject weatherJson = json.GetNamedArray("weather").GetObjectAt(0);
             string description = weatherJson.GetNamedString("main") + " - " + weatherJson.GetNamedString("description");
-            return new WeatherModel(mainJson.GetNamedNumber("temp") - 273.15, mainJson.GetNamedNumber("humidity"),
+            var weather = new WeatherModel(mainJson.GetNamedNumber("temp") - 273.15, mainJson.GetNamedNumber("humidity"),
                 mainJson.GetNamedNumber("pressure") * 100, description, String.Format("http://openweathermap.org/img/w/{0}.png", weatherJson.GetNamedString("icon")));
+            WeatherUpdate?.Invoke(this, new WeatherUpdateEventArgs(weather));
         }
 
         private HttpRequestMessage BuildRequest()
         {
-            // TODO Add ZIP code setting
-            Uri uri = new Uri(String.Format("{0}?zip={1}&appid={2}", ENDPOINT, "98052,us", Keys.OPEN_WEATHER_MAP));
+            Uri uri = new Uri(String.Format("{0}?zip={1},{2}&appid={3}", ENDPOINT, _zip, _country, _key));
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, uri);
             return req;
         }
+
+        public EventHandler WeatherUpdate;
     }
 }
