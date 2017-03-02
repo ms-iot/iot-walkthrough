@@ -3,14 +3,15 @@
 ## Introduction
 
 1. About the project
-    * Components
+    * [Software components](SoftwareComponents.md)
     * External services
-    * [Wiring](Wiring/Wiring.md)
+    * [Wiring of weather shield to DragonBoard 410c](Wiring/README.md)
 2. Background application
-    * Installing IoT templates and deploying a background app
-    * Collecting sensor data through I2C
+    * [Installing IoT templates and deploying a background app](Background/Installation/README.md)
+    * [Collecting sensor data through I2C](Background/Sensing/README.md)
     * Connecting to an Azure Provisioned Remote Monitoring solution
 3. Inter-application communication
+    * [Associating the app with the Windows store](StoreDeployment/README.md)
     * Creating an app service
     * Connecting to the app service
 4. Foreground application
@@ -28,7 +29,7 @@
     * Integration with Bing news
     * Showing OneDrive pictures
 6. Preparing for deployment
-    * [Enabling Secure Boot, Bitlocker and the TPM module](Security/TPM/TPM.md)
-    * Saving Azure keys to the TPM module
+    * [Enabling Secure Boot, BitLocker and the TPM module](Security/README.md)
+    * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
     * Provisioning an IoT image
     * Zero touch provisioning
