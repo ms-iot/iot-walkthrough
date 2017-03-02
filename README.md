@@ -4,7 +4,6 @@
 
 1. About the project
     * [Software components](SoftwareComponents.md)
-    * External services
     * [Wiring of weather shield to DragonBoard 410c](Wiring/README.md)
 2. Background application
     * [Installing IoT templates and deploying a background app](Background/Installation/README.md)
@@ -31,5 +30,5 @@
 6. Preparing for deployment
     * [Enabling Secure Boot, BitLocker and the TPM module](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
-    * Provisioning an IoT image
+    * [IoT image creation](ImageCreation/README.md)
     * Zero touch provisioning
