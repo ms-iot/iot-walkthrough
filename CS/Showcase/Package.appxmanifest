@@ -35,6 +35,7 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <uap:Capability Name="musicLibrary" />
+    <uap:Capability Name="videoLibrary" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="wifiControl" />
   </Capabilities>

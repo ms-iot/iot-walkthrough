@@ -101,9 +101,9 @@ namespace Showcase
             ContentNavigate(typeof(SlideShow));
         }
 
-        private void PlayVideo_Click(object sender, RoutedEventArgs e)
+        private void PlayMedia_Click(object sender, RoutedEventArgs e)
         {
-            ContentNavigate(typeof(MediaPlayer));
+            ContentNavigate(typeof(MediaPlayerPage));
         }
 
         private void Settings_Click(object sender, RoutedEventArgs e)
