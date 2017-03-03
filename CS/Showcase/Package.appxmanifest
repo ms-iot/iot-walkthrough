@@ -21,14 +21,6 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <uap:Extension Category="windows.appService" EntryPoint="ShowcaseBridgeService.StartupTask">
-          <uap:AppService Name="com.microsoft.showcase.bridge" />
-        </uap:Extension>
-        <!--<Extension Category="windows.backgroundTasks" EntryPoint="ShowcaseBridgeService.StartupTask">
-          <BackgroundTasks>
-            <iot:Task Type="startup" />
-          </BackgroundTasks>
-        </Extension>-->
       </Extensions>
     </Application>
   </Applications>

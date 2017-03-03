@@ -9,7 +9,7 @@ namespace ShowcaseBridgeService
             AppServiceConnection connection = new AppServiceConnection()
             {
                 AppServiceName = "com.microsoft.showcase.bridge",
-                PackageFamilyName = "19434TiagoShibata.devex-showcase_gr440wvt0bh62"
+                PackageFamilyName = "BackgroundWeatherStation-uwp_ph1m9x8skttmg"
             };
             return connection;
         }
