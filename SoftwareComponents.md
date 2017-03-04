@@ -4,10 +4,9 @@
 
 ## Applications
 
-This project's goal is to show intended usage guidelines of Windows on IoT. To fulfill this goal, our solution will have two applications:
+The solution has two applications: a background app and a foreground app. The background app collects sensor data and logs it to Azure, while the foreground app communicates with other internet services to show customizable user data. The foreground app should run on both IoT and Desktop.
 
-* One background application to receive sensor data and send it to the cloud. Receiving sensor data and analysing it are important tasks in IoT and a device will often operate in "headless" mode for monitoring; thus, we separate these tasks in an independent app.
-* One foreground application for user interaction. This application shows local weather (read by the background app) and information from the internet.
+Furthermore, the solution has a app service to allow communication between the applications. This way, the foreground app can communicate its readings to the foreground app, which displays it to the user.
 
 ## External services
 
@@ -19,3 +18,5 @@ The project has some integrations with third-party services, coming from Windows
 | Open Weather Maps     | Fetch weather condition                                         |
 | Bing                  | Displaying current news                                         |
 | OneDrive              | Fetch pictures from the user's account                          |
+
+Step by step explanations of each service's setup is given in their respective pages.
