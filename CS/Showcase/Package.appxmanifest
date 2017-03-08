@@ -20,14 +20,12 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
-      <Extensions>
-      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
     <uap:Capability Name="musicLibrary" />
-    <uap:Capability Name="videoLibrary" />
+    <uap:Capability Name="videosLibrary" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="wifiControl" />
   </Capabilities>

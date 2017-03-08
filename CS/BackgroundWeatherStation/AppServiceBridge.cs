@@ -11,39 +11,37 @@ namespace BackgroundWeatherStation
     {
         private static AppServiceConnection _service;
 
-        public static async Task SendMessageAsync(ValueSet message)
+        public static async Task InitAsync()
         {
-            // FIXME race condition
-            if (await TryOpenService())
+            Debug.WriteLine("Opening service");
+            _service = AppServiceConnectionFactory.GetConnection();
+            var serviceStatus = await _service.OpenAsync();
+            // Should never fail, since app service is installed with the background app
+            Debug.Assert(serviceStatus == AppServiceConnectionStatus.Success, "Opening service failed: " + serviceStatus);
+
+            _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
             {
-                await _service.SendMessageAsync(message);
-            }
+                Debug.WriteLine("Request callback received");
+            };
+            _service.ServiceClosed += async (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
+            {
+                _service = null;
+                Debug.WriteLine("Service closed: " + args.Status);
+                await InitAsync();
+            };
         }
 
-        private static async Task<bool> TryOpenService()
+        public static async Task SendMessageAsync(ValueSet message)
         {
-            if (_service == null)
+            try
             {
-                Debug.WriteLine("Opening service");
-                _service = AppServiceConnectionFactory.GetConnection();
-                var serviceStatus = await _service.OpenAsync();
-                if (serviceStatus != AppServiceConnectionStatus.Success)
-                {
-                    Debug.WriteLine("Opening service failed: " + serviceStatus);
-                    _service = null;
-                    return false;
-                }
-                _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
-                {
-                    Debug.WriteLine("Request callback received");
-                };
-                _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
-                {
-                    Debug.WriteLine("Service closed: " + args.Status);
-                    _service = null;
-                };
+                var task = _service?.SendMessageAsync(message);
+                await task;
             }
-            return true;
+            catch (Exception e)
+            {
+                Debug.WriteLine("Sending message failed: " + e.Message);
+            }
         }
     }
 }

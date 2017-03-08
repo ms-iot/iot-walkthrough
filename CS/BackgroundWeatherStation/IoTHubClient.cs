@@ -33,7 +33,7 @@ namespace BackgroundWeatherStation
             }
             else
             {
-                await RefreshTokenAsync();
+                await TryRefreshTokenAsync();
             }
         }
 
@@ -67,7 +67,7 @@ namespace BackgroundWeatherStation
             {
                 try
                 {
-                    if (_deviceClient == null && !await RefreshTokenAsync())
+                    if (_deviceClient == null && !await TryRefreshTokenAsync())
                     {
                         return;
                     }
@@ -103,7 +103,7 @@ namespace BackgroundWeatherStation
             catch (UnauthorizedException)
             {
                 Debug.WriteLine("Azure UnauthorizedException, refreshing SAS token");
-                if (!await RefreshTokenAsync())
+                if (!await TryRefreshTokenAsync())
                 {
                     throw new UnauthorizedException("Failed to refresh Azure connection");
                 }
@@ -112,9 +112,23 @@ namespace BackgroundWeatherStation
             return sendMessageTask;
         }
 
-        private async Task<bool> RefreshTokenAsync()
+        private async Task<bool> TryRefreshTokenAsync()
         {
-            var method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
+            IAuthenticationMethod method;
+            try
+            {
+                var token = _tpm.GetSASToken();
+                if (String.IsNullOrEmpty(token))
+                {
+                    throw new Exception("TPM generated empty token");
+                }
+                method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception authenticating with TPM token: " + e.Message);
+                return false;
+            }
 
             try
             {
