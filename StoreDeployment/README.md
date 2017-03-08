@@ -2,7 +2,9 @@
 ---
 # Associating the app with the Windows store
 
-It is necessary to associate the application with the Windows store to access some services (such as OneDrive). Associating with the store changes the **Package Family Name**, which is an identifier that we will need to create an app service for communication between the background and the foreground applications; therefore, it is easier to associate with the store before writing the app service.
+It is necessary to associate the application with the Windows store to access some services (such as OneDrive). The foreground app will be associated with the store to be able to access user pictures.
+
+It is not recommended to associate the background app with the store (deploying background apps to the store is possible, but not trivial). Associating with the store changes the **Package Family Name**, which is an identifier that we will need to create an app service for communication between the background and the foreground applications; therefore, if an app service is to be placed on the foreground app, it is easier to associate with the store before writing the app service.
 
 ## Requirements
 

@@ -42,7 +42,7 @@ Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your packa
 </PackageFile>
 ```
 
-Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. The final manifest should look like:
+Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features. The final manifest should look like:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -108,6 +108,7 @@ Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` a
       <Feature>IOT_APP_TOOLKIT</Feature>
       <Feature>IOT_CP210x_MAKERDRIVER</Feature>
       <Feature>IOT_FTSER2K_MAKERDRIVER</Feature>
+      <Feature>IOT_SPEECHDATA_EN_US</Feature>
       <!-- <Feature>IOT_ENABLE_ADMIN</Feature> -->
     </Microsoft>
     <OEM>
@@ -118,7 +119,7 @@ Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` a
       <!-- <Feature>OEM_AppxMain</Feature> -->
       <Feature>OEM_CustomCmd</Feature>
       <Feature>OEM_ProvAuto</Feature>
-      <Feature>OEM_AppxShowcase</Feature>
+      <Feature>OEM_AppxHelloImage</Feature>
     </OEM>
   </Features>
   <Product>Windows 10 IoT Core</Product>
@@ -151,4 +152,4 @@ if exist C:\AppInstall\AppInstall.cmd (
 )
 ```
 
-Build the image with `buildimage Showcase Test` and your app should show up after boot!
+Build the image with `buildimage Showcase Test` and your app will show up after boot!
