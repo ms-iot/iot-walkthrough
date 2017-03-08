@@ -38,7 +38,7 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
     * Integration with Bing news
     * Showing OneDrive pictures
 7. Preparing for deployment
-    * [Enabling Secure Boot, BitLocker and the TPM module](Security/README.md)
+    * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
     * [IoT image creation](ImageCreation/README.md)
     * Zero touch provisioning

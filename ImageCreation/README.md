@@ -116,7 +116,6 @@ Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` a
       <Feature>SBC</Feature>
       <Feature>QCDB410C_DEVICE_TARGETINGINFO</Feature>
       <Feature>QCDB410C_DEVICE_INFO</Feature>
-      <!-- <Feature>OEM_AppxMain</Feature> -->
       <Feature>OEM_CustomCmd</Feature>
       <Feature>OEM_ProvAuto</Feature>
       <Feature>OEM_AppxHelloImage</Feature>
