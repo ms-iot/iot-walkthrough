@@ -36,7 +36,10 @@ namespace BackgroundWeatherStation
             try
             {
                 var task = _service?.SendMessageAsync(message);
-                await task;
+                if (task != null)
+                {
+                    await task;
+                }
             }
             catch (Exception e)
             {

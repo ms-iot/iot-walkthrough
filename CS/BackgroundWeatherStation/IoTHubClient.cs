@@ -152,10 +152,7 @@ namespace BackgroundWeatherStation
 
         private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)
         {
-            ValueSet properties = new ValueSet
-            {
-                ["version"] = desiredProperties.Version
-            };
+            ValueSet properties = new ValueSet();
             foreach (var prop in desiredProperties)
             {
                 var pair = (KeyValuePair<string, object>)prop;
