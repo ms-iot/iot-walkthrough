@@ -30,8 +30,8 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
     * Showing a slideshow
     * Playing media
 5. Connecting to the Azure cloud
-    * [Connecting to an Azure IoT Hub using the Provisioned Remote Monitoring solution](Azure/IoTHubProvisionedSolution)
-    * Saving application keys on Azure
+    * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution)
+    * [Saving application keys on Azure](Azure/DeviceTwin/DesiredProperties/README.md)
     * Synchronizing settings with Azure
 6. Integration with third-party services
     * [Integration with OpenWeatherMap](OpenWeatherMapsIntegration.md)
