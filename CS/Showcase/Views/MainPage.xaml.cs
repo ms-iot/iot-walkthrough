@@ -17,9 +17,9 @@ namespace Showcase
         private const int LED_PIN = 21;
         private GpioPin pin;
         private MediaElement speechElement = new MediaElement();
-        private SpeechSynthesizer synth = new SpeechSynthesizer();
         private CoreDispatcher uiThreadDispatcher = null;
         private VoiceRecognition voiceRecognitionTask = new VoiceRecognition();
+        private SpeechSynthesizer synth;
 
         public MainPage()
         {
@@ -31,14 +31,18 @@ namespace Showcase
             }
             uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             InitGPIO();
+            if (SpeechSynthesizer.AllVoices.Count > 0)
+            {
+                synth = new SpeechSynthesizer();
+            }
 
             voiceRecognitionTask.recognitionCallback += VoiceCommandCallback;
             Unloaded += MainPage_Unloaded;
-            TTS("Welcome");
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            TTS("Welcome");
             await AppServiceBridge.InitAsync();
             ContentFrame.Navigate(typeof(NewsAndWeather));
         }
@@ -65,10 +69,13 @@ namespace Showcase
 
         private async void TTS(string text)
         {
-            var stream = await synth.SynthesizeTextToStreamAsync(text);
+            if (synth != null)
+            {
+                var stream = await synth.SynthesizeTextToStreamAsync(text);
 
-            this.speechElement.SetSource(stream, stream.ContentType);
-            this.speechElement.Play();
+                this.speechElement.SetSource(stream, stream.ContentType);
+                this.speechElement.Play();
+            }
         }
 
         private async void VoiceCommand_Click(object sender, RoutedEventArgs e)
@@ -101,9 +108,9 @@ namespace Showcase
             ContentNavigate(typeof(SlideShow));
         }
 
-        private void PlayVideo_Click(object sender, RoutedEventArgs e)
+        private void PlayMedia_Click(object sender, RoutedEventArgs e)
         {
-            ContentNavigate(typeof(MediaPlayer));
+            ContentNavigate(typeof(MediaPlayerPage));
         }
 
         private void Settings_Click(object sender, RoutedEventArgs e)

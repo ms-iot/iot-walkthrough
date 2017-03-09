@@ -4,9 +4,11 @@ using Microsoft.Azure.Devices.Shared;
 using Microsoft.Devices.Tpm;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Foundation.Collections;
@@ -17,7 +19,9 @@ namespace BackgroundWeatherStation
     {
         private TpmDevice _tpm = new TpmDevice(0);
         private DeviceClient _deviceClient;
+        private SemaphoreSlim _deviceClientSemaphore = new SemaphoreSlim(1);
         private String _id;
+        private ConcurrentQueue<Message> _pendingMessages = new ConcurrentQueue<Message>();
 
         public async Task InitAsync()
         {
@@ -29,60 +33,113 @@ namespace BackgroundWeatherStation
             }
             else
             {
-                await RefreshToken();
+                await TryRefreshTokenAsync();
             }
         }
 
-        public async void LogDataAsync(double temperature, double humidity, double pressure)
+        public async Task LogDataAsync(double temperature, double humidity, double pressure)
         {
             if (_id == null)
             {
                 Debug.WriteLine("TPM keys not provisioned, ignoring telemetry logging calls");
                 return;
             }
-            if (_deviceClient == null && !await RefreshToken())
-            {
-                return;
-            }
-            var messageString = new JsonObject
-            {
-                { "currentTemperature", JsonValue.CreateNumberValue(temperature) },
-                { "currentHumidity", JsonValue.CreateNumberValue(humidity) },
-                { "currentPressure", JsonValue.CreateNumberValue(pressure) },
-                { "deviceId", JsonValue.CreateStringValue(_id) },
-                { "time", JsonValue.CreateStringValue(DateTime.Now.ToString()) },
-            }.Stringify();
-            var message = new Message(Encoding.ASCII.GetBytes(messageString));
 
-            try
+            if (_pendingMessages.Count > 10)
+            {
+                Debug.WriteLine("Too many queued messages, ignoring logging call");
+            }
+            else
+            {
+                var messageString = new JsonObject
+                {
+                    { "currentTemperature", JsonValue.CreateNumberValue(temperature) },
+                    { "currentHumidity", JsonValue.CreateNumberValue(humidity) },
+                    { "currentPressure", JsonValue.CreateNumberValue(pressure) },
+                    { "deviceId", JsonValue.CreateStringValue(_id) },
+                    { "time", JsonValue.CreateStringValue(DateTime.Now.ToString()) },
+                }.Stringify();
+                var message = new Message(Encoding.ASCII.GetBytes(messageString));
+                _pendingMessages.Enqueue(message);
+            }
+
+            if (await _deviceClientSemaphore.WaitAsync(0))
             {
                 try
                 {
-                    await _deviceClient.SendEventAsync(message);
+                    if (_deviceClient == null && !await TryRefreshTokenAsync())
+                    {
+                        return;
+                    }
+
+                    if (_pendingMessages.TryPeek(out Message currentMessage))
+                    {
+                        await SendEventAsync(currentMessage);
+                        _pendingMessages.TryDequeue(out currentMessage);
+                    }
                 }
-                catch (UnauthorizedException)
+                catch (Exception e)
                 {
-                    Debug.WriteLine("Azure UnauthorizedException, refreshing SAS token");
-                    await RefreshToken();
-                    await _deviceClient.SendEventAsync(message);
+                    Debug.WriteLine("Error logging data to Azure:\n" + e.Message);
+                }
+                finally
+                {
+                    _deviceClientSemaphore.Release();
                 }
             }
-            catch (Exception e)
+            else
             {
-                Debug.WriteLine("Error logging data to Azure:\n" + e.Message);
+                Debug.WriteLine("Already communicating with Azure, skipping send");
             }
         }
 
-        private async Task<bool> RefreshToken()
+        private async Task<Task> SendEventAsync(Message message)
         {
-            var method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
-            Twin twin;
+            Task sendMessageTask = null;
+            try
+            {
+                sendMessageTask = _deviceClient.SendEventAsync(message);
+            }
+            catch (UnauthorizedException)
+            {
+                Debug.WriteLine("Azure UnauthorizedException, refreshing SAS token");
+                if (!await TryRefreshTokenAsync())
+                {
+                    throw new UnauthorizedException("Failed to refresh Azure connection");
+                }
+                sendMessageTask = _deviceClient.SendEventAsync(message);
+            }
+            return sendMessageTask;
+        }
+
+        private async Task<bool> TryRefreshTokenAsync()
+        {
+            IAuthenticationMethod method;
+            try
+            {
+                var token = _tpm.GetSASToken();
+                if (String.IsNullOrEmpty(token))
+                {
+                    throw new Exception("TPM generated empty token");
+                }
+                method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception authenticating with TPM token: " + e.Message);
+                return false;
+            }
 
             try
             {
-                _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt);
+                if (_deviceClient != null)
+                {
+                    await _deviceClient.CloseAsync();
+                }
+                _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt_WebSocket_Only);
                 await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
-                twin = await _deviceClient.GetTwinAsync();
+                var twin = await _deviceClient.GetTwinAsync();
+                await OnDesiredPropertyChanged(twin.Properties.Desired, null);
             }
             catch (Exception e)
             {
@@ -90,14 +147,15 @@ namespace BackgroundWeatherStation
                 _deviceClient = null;
                 return false;
             }
-            // FIXME race condition
-            await OnDesiredPropertyChanged(twin.Properties.Desired, null);
             return true;
         }
 
         private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)
         {
-            ValueSet properties = new ValueSet();
+            ValueSet properties = new ValueSet
+            {
+                ["version"] = desiredProperties.Version
+            };
             foreach (var prop in desiredProperties)
             {
                 var pair = (KeyValuePair<string, object>)prop;

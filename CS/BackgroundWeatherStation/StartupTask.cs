@@ -28,22 +28,23 @@ namespace BackgroundWeatherStation
                 return;
             }
             await _client.InitAsync();
+            await AppServiceBridge.InitAsync();
 
             taskInstance.Canceled += (IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) =>
             {
                 Debug.WriteLine("Cancelled: reason " + reason);
             };
 
-            _timer = ThreadPoolTimer.CreatePeriodicTimer(LogSensorData, TimeSpan.FromSeconds(5));
+            _timer = ThreadPoolTimer.CreatePeriodicTimer(LogSensorDataAsync, TimeSpan.FromSeconds(5));
         }
 
-        private async void LogSensorData(ThreadPoolTimer timer)
+        private async void LogSensorDataAsync(ThreadPoolTimer timer)
         {
             var temperature = _station.ReadTemperature();
             var humidity = _station.ReadHumidity();
             var pressure = _station.ReadPressure();
 
-            _client.LogDataAsync(temperature, humidity, pressure);
+            await _client.LogDataAsync(temperature, humidity, pressure);
 
             ValueSet message = new ValueSet
             {

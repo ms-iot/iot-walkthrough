@@ -16,7 +16,7 @@ namespace Showcase
             _request = request;
         }
 
-        public async Task<JsonObject> GetJsonAsync()
+        public async Task<JsonObject> TryGetJsonAsync()
         {
             HttpClient client = new HttpClient();
             HttpResponseMessage response;

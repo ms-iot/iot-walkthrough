@@ -23,12 +23,15 @@ namespace Showcase
                 };
                 _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
                 {
-                    Debug.WriteLine("Service closed: " + args.Status);
                     _service = null;
+                    Debug.WriteLine("Service closed: " + args.Status);
                 };
                 var status = await _service.OpenAsync();
-                // Should never fail, since app service is installed with the foreground app
-                Debug.Assert(status == AppServiceConnectionStatus.Success, "Connection to app service failed");
+                if (status != AppServiceConnectionStatus.Success)
+                {
+                    _service = null;
+                    Debug.WriteLine("Connection to app service failed: " + status);
+                }
             }
         }
 
@@ -38,7 +41,11 @@ namespace Showcase
             {
                 [key] = null
             };
-            await _service.SendMessageAsync(message);
+            var task = _service?.SendMessageAsync(message);
+            if (task != null)
+            {
+                await task;
+            }
         }
 
         public static TypedEventHandler<AppServiceConnection, AppServiceRequestReceivedEventArgs> RequestReceived;
