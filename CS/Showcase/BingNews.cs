@@ -11,6 +11,8 @@ namespace Showcase
     {
         private const String ENDPOINT = "https://api.cognitive.microsoft.com/bing/v5.0/news/";
         private string _key;
+        private long _keyVersion = -1;
+        private object _keyVersionLock = new object();
         private ThreadPoolTimer _timer;
         private object _timerLock = new object();
         private bool _started;
@@ -71,7 +73,24 @@ namespace Showcase
             args.Request.Message.TryGetValue("bingKey", out object key);
             if (key != null)
             {
-                _key = (string)key;
+                lock (_keyVersionLock)
+                {
+                    if (args.Request.Message.TryGetValue("version", out object version))
+                    {
+                        var receivedVersion = (long)version;
+                        if (receivedVersion >= _keyVersion)
+                        {
+                            _keyVersion = receivedVersion;
+                        }
+                    }
+                    else if (_keyVersion != -1)
+                    {
+                        // Do nothing if we have already received a key with version information
+                        // and the newer one has no version.
+                        return;
+                    }
+                    _key = (string)key;
+                }
                 InitTimer();
             }
         }

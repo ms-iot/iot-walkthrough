@@ -37,7 +37,7 @@ namespace BackgroundWeatherStation
             }
         }
 
-        public async void LogDataAsync(double temperature, double humidity, double pressure)
+        public async Task LogDataAsync(double temperature, double humidity, double pressure)
         {
             if (_id == null)
             {
@@ -136,7 +136,7 @@ namespace BackgroundWeatherStation
                 {
                     await _deviceClient.CloseAsync();
                 }
-                _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt);
+                _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt_WebSocket_Only);
                 await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
                 var twin = await _deviceClient.GetTwinAsync();
                 await OnDesiredPropertyChanged(twin.Properties.Desired, null);
@@ -152,7 +152,10 @@ namespace BackgroundWeatherStation
 
         private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)
         {
-            ValueSet properties = new ValueSet();
+            ValueSet properties = new ValueSet
+            {
+                ["version"] = desiredProperties.Version
+            };
             foreach (var prop in desiredProperties)
             {
                 var pair = (KeyValuePair<string, object>)prop;
