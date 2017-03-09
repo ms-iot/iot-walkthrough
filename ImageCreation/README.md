@@ -10,7 +10,7 @@ To deploy multiple IoT boards, it is desirable to have a final image of the oper
 
 [Follow the instructions here to download required tools.](https://msdn.microsoft.com/windows/hardware/commercialize/manufacture/iot/set-up-your-pc-to-customize-iot-core) After downloading the ISO with packages and manifests, install the ARM package (*Windows_10_IoT_Core_ARM_Packages.msi*).
 
-Download the DragonBoard packages (**TODO:** these aren't public, whom should the costumer contact to download the packages?) and save them to `C:\Program Files (x86)\Windows Kits\10\MSPackages\Retail\ARM\fre`.
+Download the DragonBoard packages by contacting a Qualcomm provider.  Save them to `C:\Program Files (x86)\Windows Kits\10\MSPackages\Retail\ARM\fre`.
 
 ## Creating a basic image
 
@@ -32,6 +32,8 @@ Choose *No* when asked whether you want to upload to the store. Choose an *Outpu
 
 Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
 
+To add a second app (for example, the background app for the weather station), use `newappxpkg`, but edit the generated manifest (at `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation\Appx.BackgroundWeatherStation.pkg.xml`) before building. Remove the lines that install `AppInstall.cmd`, `AppxConfig.cmd`, `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these files and packages will be already provided by Appx.Showcase). Then run `buildpkg Appx.BackgroundWeatherStation`.
+
 Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your package file to the OEM features:
 
 ```xml
@@ -40,9 +42,14 @@ Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your packa
     <FeatureID>OEM_AppxShowcase</FeatureID>
   </FeatureIDs>
 </PackageFile>
+<PackageFile Path="%PKGBLD_DIR%" Name="%OEM_NAME%.Appx.BackgroundWeatherStation.cab">
+  <FeatureIDs>
+    <FeatureID>OEM_AppxBackgroundWeatherStation</FeatureID>
+  </FeatureIDs>
+</PackageFile>
 ```
 
-Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features. The final manifest should look like:
+Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features. [A complete list of features is available here](https://msdn.microsoft.com/en-us/windows/hardware/commercialize/manufacture/iot/iot-core-feature-list). The final manifest should look like:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -119,6 +126,7 @@ Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` a
       <Feature>OEM_CustomCmd</Feature>
       <Feature>OEM_ProvAuto</Feature>
       <Feature>OEM_AppxHelloImage</Feature>
+      <Feature>OEM_AppxBackgroundWeatherStation</Feature>
     </OEM>
   </Features>
   <Product>Windows 10 IoT Core</Product>
