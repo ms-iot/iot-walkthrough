@@ -1,6 +1,6 @@
 ---
 ---
-# Enabling Secure Boot, BitLocker and the TPM module
+# Enabling Secure Boot, BitLocker and the ConfigCI
 
 ## Introduction
 Secure Boot enforces the verification of signatures of binaries before booting them. By enabling Secure Boot and checking for Microsoft signatures, we ensure that boot code has not been tampered with and is exactly was expected.

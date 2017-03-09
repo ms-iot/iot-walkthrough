@@ -12,6 +12,11 @@ The background application should be capable of:
 * Receiving user configurations from Azure (for example, changing the frequency that sensor data gets collected)
 
 ## Installation
+
+Visual Studio 2017 with Universal Windows Platform support will be used. When installing VS2017, make sure *Universal Windows Platform development* is selected.
+
+![Visual Studio installation](Visual Studio.png)
+
 Install the [Windows IoT Core Project Templates](https://marketplace.visualstudio.com/items?itemName=MicrosoftIoT.WindowsIoTCoreProjectTemplates) package, which provides a template for background applications on IoT. [More information on background applications can be found here.](https://developer.microsoft.com/en-us/windows/iot/docs/backgroundapplications)
 
 ## Creating a monitoring background application
