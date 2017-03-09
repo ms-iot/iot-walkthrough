@@ -42,3 +42,5 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
     * [IoT image creation](ImageCreation/README.md)
     * Zero touch provisioning
+8. Deployment
+    * [Creating a retail OEM image](ImageCreation/Retail/README.md)
