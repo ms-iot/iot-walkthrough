@@ -17,24 +17,24 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
 2. Background application
     * [Installing IoT templates and deploying a background app](Background/Installation/README.md)
     * [Collecting sensor data through I2C](Background/Sensing/README.md)
-3. Inter-application communication
-    * [Associating the app with the Windows store](StoreDeployment/README.md)
-    * Creating an app service
-    * Connecting to the app service
-4. Foreground application
+3. Foreground application
     * Creating a foreground application
-    * Bundling the app service
-    * Showing local weather data
     * Usage of text-to-speech
     * Receiving voice commands
     * Showing a slideshow
     * Playing media
+4. Inter-application communication
+    * [Associating the app with the Windows store](StoreDeployment/README.md)
+    * Creating an app service
+    * Bundling the app service
+    * Connecting to the app service
+    * Showing local weather data
 5. Connecting to the Azure cloud
-    * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution)
+    * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution/README.md)
     * [Saving application keys on Azure](Azure/DeviceTwin/DesiredProperties/README.md)
     * Synchronizing settings with Azure
 6. Integration with third-party services
-    * [Integration with OpenWeatherMap](OpenWeatherMapsIntegration.md)
+    * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
     * Integration with Bing news
     * Showing OneDrive pictures
 7. Preparing for deployment
