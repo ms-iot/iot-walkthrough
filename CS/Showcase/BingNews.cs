@@ -111,7 +111,7 @@ namespace Showcase
 
         private async void FetchNews()
         {
-            JsonObject json = await new HttpHelper(BuildRequest()).GetJsonAsync();
+            JsonObject json = await new HttpHelper(BuildRequest()).TryGetJsonAsync();
             if (json == null)
             {
                 return;
