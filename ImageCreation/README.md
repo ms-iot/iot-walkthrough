@@ -4,7 +4,7 @@
 
 ## Introduction
 
-To deploy multiple IoT boards, it is desirable to have a final image of the operating system and all apps and configurations. The device can be ready for deployment after flashing the image, without requiring the installation of apps and settings separately, speeding up the deployment.
+To deploy multiple IoT boards, it is desirable to have a final image of the operating system and all apps and configurations. The device can be ready for deployment after flashing the image, without requiring the installation of apps and settings separately, speeding up the deployment. We will be targeting the Qualcomm DragonBoard in this tutorial.
 
 ## Required tools
 
@@ -49,7 +49,11 @@ Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your packa
 </PackageFile>
 ```
 
-Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features. [A complete list of features is available here](https://msdn.microsoft.com/en-us/windows/hardware/commercialize/manufacture/iot/iot-core-feature-list). The final manifest should look like:
+Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features.
+
+**Note:** Your app might crash if features are missing. [Check the complete list of features if you need to find a missing feature.](https://msdn.microsoft.com/en-us/windows/hardware/commercialize/manufacture/iot/iot-core-feature-list) There is a limit to the number of times a startup app is allowed to crash before a board reboot is issued; if your app works on a production image but not on an OEM image (eg. app stuck at the loading screen and the board reboots after some time), you are probably missing some feature.
+
+The final manifest should look like:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>

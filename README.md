@@ -24,7 +24,7 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
     * Showing a slideshow
     * Playing media
 4. Inter-application communication
-    * [Associating the app with the Windows store](StoreDeployment/README.md)
+    * [Associating the app with the Windows Store](StoreDeployment/README.md)
     * Creating an app service
     * Bundling the app service
     * Connecting to the app service
@@ -41,6 +41,6 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
     * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
     * [IoT image creation](ImageCreation/README.md)
-    * Zero touch provisioning
 8. Deployment
     * [Creating a retail OEM image](ImageCreation/Retail/README.md)
+    * Zero touch provisioning

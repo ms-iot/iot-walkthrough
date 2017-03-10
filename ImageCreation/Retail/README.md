@@ -78,7 +78,7 @@ We'll start with the template manifest for retail images and add the features we
   </AdditionalFMs>
   <Features>
     <Microsoft>
-      <Feature>IOT_EFIESP_TEST</Feature>
+      <Feature>IOT_EFIESP</Feature>
       <Feature>IOT_EFIESP_BCD</Feature>
       <!-- <Feature>IOT_DMAP_DRIVER</Feature> -->
       <Feature>IOT_CP210x_MAKERDRIVER</Feature>
@@ -94,7 +94,7 @@ We'll start with the template manifest for retail images and add the features we
     </Microsoft>
     <OEM>
       <!-- Include BSP Features -->
-      <Feature>QC_UEFI_TEST</Feature>
+      <Feature>QC_UEFI</Feature>
       <Feature>SBC</Feature>
       <Feature>QCDB410C_DEVICE_TARGETINGINFO</Feature>
       <Feature>QCDB410C_DEVICE_INFO</Feature>

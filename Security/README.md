@@ -3,9 +3,15 @@
 # Enabling Secure Boot, BitLocker and the ConfigCI
 
 ## Introduction
-Secure Boot enforces the verification of signatures of binaries before booting them. By enabling Secure Boot and checking for Microsoft signatures, we ensure that boot code has not been tampered with and is exactly was expected.
+Secure Boot enforces the verification of signatures of binaries before booting them. By enabling Secure Boot and checking for Microsoft signatures, we ensure that boot code has not been tampered with.
 
-To enable Secure Boot, we will follow the [instructions on this page](https://developer.microsoft.com/en-us/windows/iot/docs/SecureBootAndBitLocker). A supported board is required. The steps described here are valid for the DragonBoard 410c. It is assumed that the device has been previously flashed with a Windows 10 IoT Core image, and the PC has the required Windows SDK (usually installed alongside Visual Studio) for Windows 8.1 or newer.
+BitLocker is a full disk encryption feature of Windows, which also adds system integrity verification of early boot files. [The documentation for BitLocker can be found here.](https://technet.microsoft.com/en-us/library/cc732774(v=ws.11).aspx)
+
+ConfigCI (Configurable Code Integrity) enforces signing of binaries to avoid execution of untrusted code.
+
+To enable these security features, we will follow the [instructions on this page](https://developer.microsoft.com/en-us/windows/iot/docs/SecureBootAndBitLocker). A supported board is required. The steps described here are valid for the DragonBoard 410c, which contains a Trusted Platform Module (TPM) chip. Devices without a TPM won't support all BitLocker features.
+
+It is assumed that the device has been previously flashed with a Windows 10 IoT Core image, and the PC has the required Windows SDK (usually installed alongside Visual Studio) for Windows 8.1 or newer.
 
 ## Enabling RPMB
 A Replay Protected Memory Block (RPMB) is required to enable Secure Boot.
