@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Azure.Devices.Shared;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation.Collections;
 using Windows.System.Threading;
@@ -27,7 +30,7 @@ namespace BackgroundWeatherStation
                 _deferral.Complete();
                 return;
             }
-            await AppServiceBridge.InitAsync();
+            await AppServiceBridge.InitAsync(AppServiceRequestHandler);
             await _client.InitAsync();
 
             taskInstance.Canceled += (IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) =>
@@ -55,6 +58,19 @@ namespace BackgroundWeatherStation
             await AppServiceBridge.SendMessageAsync(message);
 
             Debug.WriteLine("Logged data");
+        }
+
+        private async void AppServiceRequestHandler(AppServiceConnection connection, AppServiceRequestReceivedEventArgs args)
+        {
+            if (args.Request.Message.TryGetValue("Config", out object config))
+            {
+                TwinCollection collection = new TwinCollection();
+                foreach (var pair in (Dictionary<string, string>)config)
+                {
+                    collection[pair.Key] = pair.Value;
+                }
+                await _client.UpdateReportedPropertiesAsync(collection);
+            }
         }
     }
 }

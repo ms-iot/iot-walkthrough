@@ -4,6 +4,7 @@ using Microsoft.Azure.Devices.Shared;
 using Microsoft.Devices.Tpm;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,6 +18,8 @@ namespace BackgroundWeatherStation
 {
     class IoTHubClient
     {
+        public delegate void DeviceOperation(DeviceClient client);
+
         private TpmDevice _tpm = new TpmDevice(0);
         private DeviceClient _deviceClient;
         private SemaphoreSlim _deviceClientSemaphore = new SemaphoreSlim(1);
@@ -51,32 +54,14 @@ namespace BackgroundWeatherStation
             }
             else
             {
-                var messageString = new JsonObject
-                {
-                    { "currentTemperature", JsonValue.CreateNumberValue(temperature) },
-                    { "currentHumidity", JsonValue.CreateNumberValue(humidity) },
-                    { "currentPressure", JsonValue.CreateNumberValue(pressure) },
-                    { "deviceId", JsonValue.CreateStringValue(_id) },
-                    { "time", JsonValue.CreateStringValue(DateTime.Now.ToString()) },
-                }.Stringify();
-                var message = new Message(Encoding.ASCII.GetBytes(messageString));
-                _pendingMessages.Enqueue(message);
+                EnqueueMessage(temperature, humidity, pressure);
             }
 
             if (await _deviceClientSemaphore.WaitAsync(0))
             {
                 try
                 {
-                    if (_deviceClient == null && !await TryRefreshTokenAsync())
-                    {
-                        return;
-                    }
-
-                    if (_pendingMessages.TryPeek(out Message currentMessage))
-                    {
-                        await SendEventAsync(currentMessage);
-                        _pendingMessages.TryDequeue(out currentMessage);
-                    }
+                    await SendQueuedMessages();
                 }
                 catch (Exception e)
                 {
@@ -93,12 +78,74 @@ namespace BackgroundWeatherStation
             }
         }
 
-        private async Task<Task> SendEventAsync(Message message)
+        public async Task UpdateReportedPropertiesAsync(TwinCollection properties)
         {
-            Task sendMessageTask = null;
+            if (await _deviceClientSemaphore.WaitAsync(5000))
+            {
+                try
+                {
+                    await DoDeviceOperation(async (DeviceClient client) => { await client.UpdateReportedPropertiesAsync(properties); });
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine($"Failed to save settings to Azure: {e.Message}");
+                }
+                finally
+                {
+                    _deviceClientSemaphore.Release();
+                }
+            }
+
+        }
+
+        private void EnqueueMessage(double temperature, double humidity, double pressure)
+        {
+            var messageString = new JsonObject
+                {
+                    { "currentTemperature", JsonValue.CreateNumberValue(temperature) },
+                    { "currentHumidity", JsonValue.CreateNumberValue(humidity) },
+                    { "currentPressure", JsonValue.CreateNumberValue(pressure) },
+                    { "deviceId", JsonValue.CreateStringValue(_id) },
+                    { "time", JsonValue.CreateStringValue(DateTime.Now.ToString()) },
+                }.Stringify();
+            var message = new Message(Encoding.ASCII.GetBytes(messageString));
+            _pendingMessages.Enqueue(message);
+        }
+
+        private async Task SendQueuedMessages()
+        {
+            if (_deviceClient == null && !await TryRefreshTokenAsync())
+            {
+                // No connection and failed to reconnect.
+                return;
+            }
+
+            List<Message> messages = new List<Message>();
+            while (_pendingMessages.TryDequeue(out Message message))
+            {
+                messages.Add(message);
+            }
+
             try
             {
-                sendMessageTask = _deviceClient.SendEventAsync(message);
+                await DoDeviceOperation(async (DeviceClient client) => { await _deviceClient.SendEventBatchAsync(messages); });
+            }
+            catch (Exception e)
+            {
+                // Re-enqueue failed events.
+                foreach (var message in messages)
+                {
+                    _pendingMessages.Enqueue(message);
+                }
+                throw new Exception("SendEventBatchAsync failed: " + e.Message, e);
+            }
+        }
+
+        private async Task DoDeviceOperation(DeviceOperation operation)
+        {
+            try
+            {
+                operation(_deviceClient);
             }
             catch (UnauthorizedException)
             {
@@ -107,9 +154,8 @@ namespace BackgroundWeatherStation
                 {
                     throw new UnauthorizedException("Failed to refresh Azure connection");
                 }
-                sendMessageTask = _deviceClient.SendEventAsync(message);
+                operation(_deviceClient);
             }
-            return sendMessageTask;
         }
 
         private async Task<bool> TryRefreshTokenAsync()
@@ -137,9 +183,11 @@ namespace BackgroundWeatherStation
                     await _deviceClient.CloseAsync();
                 }
                 _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt_WebSocket_Only);
-                await _deviceClient.SetDesiredPropertyUpdateCallback(OnDesiredPropertyChanged, null);
+                await _deviceClient.OpenAsync();
+                await _deviceClient.SetDesiredPropertyUpdateCallback(SendPropertyChange, null);
                 var twin = await _deviceClient.GetTwinAsync();
-                await OnDesiredPropertyChanged(twin.Properties.Desired, null);
+                await SendPropertyChange(twin.Properties.Desired, null);
+                await SendPropertyChange(twin.Properties.Reported, null);
             }
             catch (Exception e)
             {
@@ -150,10 +198,10 @@ namespace BackgroundWeatherStation
             return true;
         }
 
-        private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)
+        private async Task SendPropertyChange(IEnumerable changedProperties, object userContext)
         {
             ValueSet properties = new ValueSet();
-            foreach (var prop in desiredProperties)
+            foreach (var prop in changedProperties)
             {
                 var pair = (KeyValuePair<string, object>)prop;
                 var value = pair.Value as JValue;
