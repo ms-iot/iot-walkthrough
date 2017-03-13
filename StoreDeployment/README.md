@@ -1,10 +1,10 @@
 ---
 ---
-# Associating the app with the Windows store
+# Associating the app with the Windows Store
 
-It is necessary to associate the application with the Windows store to access some services (such as OneDrive). The foreground app will be associated with the store to be able to access user pictures.
+It is necessary to associate the application with the Windows Store to access some services (such as OneDrive). The foreground app will be associated with the Store to be able to access user pictures.
 
-It is not recommended to associate the background app with the store (deploying background apps to the store is possible, but not trivial). Associating with the store changes the **Package Family Name**, which is an identifier that we will need to create an app service for communication between the background and the foreground applications; therefore, if an app service is to be placed on the foreground app, it is easier to associate with the store before writing the app service.
+Associating with the Store changes the **Package Family Name**, which is an identifier that we will need to create an app service for communication between the background and the foreground applications; therefore, if an app service is to be placed on the foreground app, it is easier to associate with the Store before writing the app service.
 
 ## Requirements
 
@@ -22,8 +22,8 @@ That's all! To get the Package Family Name, click *App management* and choose th
 
 ![Package Family Name](PFN.png)
 
-# Associating the app with the store
+# Associating the app with the Store
 
-Whenever you need to associate your app with the store, right click your project and choose *Store > Associate App with the Store...* and follow the instructions. You will have to login with the same Microsoft account used to create the app.
+Whenever you need to associate your app with the Store, right click your project and choose *Store > Associate App with the Store...* and follow the instructions. You will have to login with the same Microsoft account used to create the app.
 
-![Associating with store](Associating with store.png)
+![Associating with Store](Associating with Store.png)
