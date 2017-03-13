@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -14,16 +15,31 @@ namespace Showcase
         private CoreDispatcher uiThreadDispatcher = null;
         private IReadOnlyList<StorageFile> _fileList;
         private int _currentFile;
+        private VoiceCommand _voiceCommand = new VoiceCommand();
+        private Dictionary<string, RoutedEventHandler> _voiceCallbacks;
 
         public MediaPlayerPage()
         {
             this.InitializeComponent();
             uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             Player.AutoPlay = true;
+
+            _voiceCallbacks = new Dictionary<string, RoutedEventHandler>()
+            {
+                { "Play audio", PlayAudio_Click },
+                { "Play music", PlayAudio_Click },
+                { "Play video", PlayVideo_Click },
+            };
         }
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            _voiceCommand.AddCommands(_voiceCallbacks);
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            _voiceCommand.RemoveCommands(_voiceCallbacks);
             Player.Source = null;
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
+using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 namespace BackgroundWeatherStation
@@ -11,7 +12,7 @@ namespace BackgroundWeatherStation
     {
         private static AppServiceConnection _service;
 
-        public static async Task InitAsync()
+        public static async Task InitAsync(TypedEventHandler<AppServiceConnection, AppServiceRequestReceivedEventArgs> handler = null)
         {
             Debug.WriteLine("Opening service");
             _service = AppServiceConnectionFactory.GetConnection();
@@ -19,10 +20,10 @@ namespace BackgroundWeatherStation
             // Should never fail, since app service is installed with the background app
             Debug.Assert(serviceStatus == AppServiceConnectionStatus.Success, "Opening service failed: " + serviceStatus);
 
-            _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) =>
+            if (handler != null)
             {
-                Debug.WriteLine("Request callback received");
-            };
+                _service.RequestReceived += handler;
+            }
             _service.ServiceClosed += async (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
             {
                 _service = null;
@@ -36,7 +37,14 @@ namespace BackgroundWeatherStation
             try
             {
                 var task = _service?.SendMessageAsync(message);
-                await task;
+                if (task != null)
+                {
+                    await task;
+                }
+                else
+                {
+                    Debug.WriteLine("Service returned null task");
+                }
             }
             catch (Exception e)
             {

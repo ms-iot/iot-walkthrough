@@ -22,7 +22,7 @@ namespace ShowcaseBridgeService
     {
         private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
-        private static ValueSet _valueStore;
+        private static ValueSet _valueStorage;
         private static EventHandler ValueChanged;
 
         public void Run(IBackgroundTaskInstance taskInstance)
@@ -30,9 +30,9 @@ namespace ShowcaseBridgeService
             taskInstance.Canceled += OnTaskCanceled;
             Debug.WriteLine("ShowcaseBridgeService FamilyName: " + Windows.ApplicationModel.Package.Current.Id.FamilyName);
 
-            if (_valueStore == null)
+            if (_valueStorage == null)
             {
-                _valueStore = new ValueSet();
+                _valueStorage = new ValueSet();
             }
 
             if (SetupConnection(taskInstance.TriggerDetails as AppServiceTriggerDetails))
@@ -85,13 +85,13 @@ namespace ShowcaseBridgeService
             {
                 if (element.Value != null)
                 {
-                    _valueStore[element.Key] = element.Value;
+                    _valueStorage[element.Key] = element.Value;
                     values.Add(element.Key, element.Value);
                 }
                 else
                 {
                     var key = element.Key;
-                    _valueStore.TryGetValue(key, out object value);
+                    _valueStorage.TryGetValue(key, out object value);
                     requestedValues.Add(key, value);
                 }
             }

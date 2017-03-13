@@ -9,9 +9,21 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel Margin="10,10,10,10">
-            <TextBlock Text="News" FontWeight="Bold" FontSize="18" Margin="5,5,5,5" />
-            <TextBlock Text="Category" />
-            <ComboBox ItemsSource="{x:Bind NewsCategories}" />
+            <TextBlock Text="News" FontSize="24" Margin="15,15,15,15" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Region" />
+                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{x:Bind NewsRegions}" SelectionChanged="RegionCombo_SelectionChanged" Margin="15,0,0,2" />
+                <TextBlock Name="NewsCategoriesTextBlock" Grid.Row="1" Grid.Column="0" Text="Category" />
+                <ComboBox Name="NewsCategoriesCombo" Grid.Row="1" Grid.Column="1" ItemsSource="{x:Bind NewsCategories}" Margin="15,0,0,2" />
+            </Grid>
         </StackPanel>
     </Grid>
 </Page>

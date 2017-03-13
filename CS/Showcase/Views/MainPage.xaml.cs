@@ -1,91 +1,52 @@
-﻿using System.Diagnostics;
-using System;
-using Windows.Devices.Gpio;
-using Windows.Media.SpeechSynthesis;
-using Windows.UI.Core;
+﻿using System;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml;
-using Windows.ApplicationModel.Background;
+using System.Collections.Generic;
+using Windows.UI.Core;
 
 namespace Showcase
 {
-    /// <summary>
-    /// Main page layout, containing a navigation panel and a frame for main content.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
-        private const int LED_PIN = 21;
-        private GpioPin pin;
-        private MediaElement speechElement = new MediaElement();
-        private CoreDispatcher uiThreadDispatcher = null;
-        private VoiceRecognition voiceRecognitionTask = new VoiceRecognition();
-        private SpeechSynthesizer synth;
+        private VoiceCommand _voiceCommand = new VoiceCommand();
+        private Dictionary<string, RoutedEventHandler> _voiceCallbacks;
 
         public MainPage()
         {
             this.InitializeComponent();
-            Debug.WriteLine("Running tasks:");
-            foreach (var task in BackgroundTaskRegistration.AllTasks)
-            {
-                Debug.WriteLine(task.Value.Name);
-            }
-            uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            InitGPIO();
-            if (SpeechSynthesizer.AllVoices.Count > 0)
-            {
-                synth = new SpeechSynthesizer();
-            }
 
-            voiceRecognitionTask.recognitionCallback += VoiceCommandCallback;
-            Unloaded += MainPage_Unloaded;
+            _voiceCommand.Init(CoreWindow.GetForCurrentThread().Dispatcher);
+            _voiceCallbacks = new Dictionary<string, RoutedEventHandler>()
+            {
+                { "Start slideShow", SlideShow_Click },
+                { "Start media player", MediaPlayer_Click },
+                { "Start WiFI connection", WiFiConnection_Click },
+                { "Start news and weather", NewsAndWeather_Click },
+            };
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            TTS("Welcome");
             await AppServiceBridge.InitAsync();
-            ContentFrame.Navigate(typeof(NewsAndWeather));
-        }
-
-        private void MainPage_Unloaded(object sender, RoutedEventArgs e)
-        {
-            pin.Dispose();
-        }
-
-        private void InitGPIO()
-        {
-            var gpio = GpioController.GetDefault();
-
-            if (gpio == null)
+            new TextToSpeech("Welcome").Play();
+            foreach (var pair in _voiceCallbacks)
             {
-                Debug.WriteLine("No GPIO controller found");
-                return;
+                _voiceCommand.AddCommand(pair.Key, pair.Value);
             }
-
-            pin = gpio.OpenPin(LED_PIN);
-            SetLed(GpioPinValue.Low);
-            pin.SetDriveMode(GpioPinDriveMode.Output);
+            ContentNavigate(typeof(NewsAndWeather));
         }
 
-        private async void TTS(string text)
+        private void OnUnload(object sender, RoutedEventArgs e)
         {
-            if (synth != null)
+            foreach (var key in _voiceCallbacks.Keys)
             {
-                var stream = await synth.SynthesizeTextToStreamAsync(text);
-
-                this.speechElement.SetSource(stream, stream.ContentType);
-                this.speechElement.Play();
+                _voiceCommand.RemoveCommand(key);
             }
-        }
-
-        private async void VoiceCommand_Click(object sender, RoutedEventArgs e)
-        {
-            SetLed(GpioPinValue.High);
-            await voiceRecognitionTask.RunVoiceRecognition(uiThreadDispatcher);
         }
 
         private void ContentNavigate(Type page)
         {
+            Splitter.IsPaneOpen = false;
             if (ContentFrame.CurrentSourcePageType != page)
             {
                 ContentFrame.Navigate(page);
@@ -93,14 +54,9 @@ namespace Showcase
             }
         }
 
-        private void WiFiConnect_Click(object sender, RoutedEventArgs e)
+        private async void VoiceCommand_Click(object sender, RoutedEventArgs e)
         {
-            ContentNavigate(typeof(WiFiConnection));
-        }
-
-        private void NewsAndWeather_Click(object sender, RoutedEventArgs e)
-        {
-            ContentNavigate(typeof(NewsAndWeather));
+            await _voiceCommand.RunVoiceRecognition();
         }
 
         private void SlideShow_Click(object sender, RoutedEventArgs e)
@@ -108,9 +64,19 @@ namespace Showcase
             ContentNavigate(typeof(SlideShow));
         }
 
-        private void PlayMedia_Click(object sender, RoutedEventArgs e)
+        private void MediaPlayer_Click(object sender, RoutedEventArgs e)
         {
             ContentNavigate(typeof(MediaPlayerPage));
+        }
+
+        private void WiFiConnection_Click(object sender, RoutedEventArgs e)
+        {
+            ContentNavigate(typeof(WiFiConnection));
+        }
+
+        private void NewsAndWeather_Click(object sender, RoutedEventArgs e)
+        {
+            ContentNavigate(typeof(NewsAndWeather));
         }
 
         private void Settings_Click(object sender, RoutedEventArgs e)
@@ -126,22 +92,6 @@ namespace Showcase
         private void PanelToggle_Click(object sender, RoutedEventArgs e)
         {
             Splitter.IsPaneOpen = !Splitter.IsPaneOpen;
-        }
-
-        private void VoiceCommandCallback(String command)
-        {
-            SetLed(GpioPinValue.Low);
-            Debug.WriteLine("Heard you say " + command);
-            if (command == VoiceRecognition.SLIDESHOW_COMMAND)
-                ContentNavigate(typeof(SlideShow));
-        }
-
-        private void SetLed(GpioPinValue value)
-        {
-            if (pin != null)
-            {
-                pin.Write(value);
-            }
         }
     }
 }
