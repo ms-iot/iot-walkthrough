@@ -35,4 +35,4 @@ To generate the certificates:
     * The script assumes a x64 PC with the Windows Developer Kit tools for **Windows 8.1 or newer** installed to `C:\Program Files (x86)\Windows Kits\10\bin\x64\`. Edit the script if this is not the case.
 
 ## Enabling SecureBoot/BitLocker/ConfigCI
-After booting the device, [open a SSH session](https://developer.microsoft.com/en-us/windows/iot/docs/ssh) to it. Copy the files from **TODO put link here once it goes public** to `C:\iotsec` and run `C:\iotsec\setup.cmd` as administrator. Reboot the board.
+**TODO: Public instructions and link to cab package to enable these features should be released by end of 1703. Update this page once it happens.**
