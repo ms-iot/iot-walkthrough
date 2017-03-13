@@ -106,6 +106,7 @@
     <Compile Include="OneDriveItemController.cs" />
     <Compile Include="OneDriveItemModel.cs" />
     <Compile Include="OpenWeatherMap.cs" />
+    <Compile Include="TextToSpeech.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -128,7 +129,7 @@
     <Compile Include="Views\WiFiConnection.xaml.cs">
       <DependentUpon>WiFiConnection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VoiceRecognition.cs" />
+    <Compile Include="VoiceCommand.cs" />
     <Compile Include="WeatherModel.cs" />
     <Compile Include="WiFiNetworkDisplay.cs" />
   </ItemGroup>

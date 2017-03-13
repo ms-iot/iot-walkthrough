@@ -18,23 +18,67 @@ namespace Showcase
         private int currentImage = 0;
         private int imageTime = 10000;
         private ThreadPoolTimer startFadeTimer;
+        private DispatcherTimer _hideControlsTimer;
         private CoreDispatcher uiDispatcher;
         private OneDriveItemController _oneDrive = new OneDriveItemController();
         private List<OneDriveItemModel> _images;
+        private VoiceCommand _voiceCommand = new VoiceCommand();
+        private Dictionary<string, RoutedEventHandler> _voiceCallbacks;
 
         public SlideShow()
         {
             this.InitializeComponent();
             uiDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             SetBackground(Color.FromArgb(255, 255, 255, 255));
+
+            _voiceCallbacks = new Dictionary<string, RoutedEventHandler>()
+            {
+                { "Toggle", Toggle_Click },
+                { "Previous", Previous_Click },
+                { "Next", Next_Click },
+            };
+
+            _hideControlsTimer = new DispatcherTimer();
+            _hideControlsTimer.Tick += (object timer, object args) =>
+            {
+                SlideShowControls.Visibility = Visibility.Collapsed;
+            };
+            _hideControlsTimer.Interval = TimeSpan.FromSeconds(10);
         }
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
             await _oneDrive.InitAsync();
             _images = await _oneDrive.GetImagesAsync(null);
-            BackgroundImage.Source = await LoadImage(_images[0].Id);
+
+            if (_images.Count == 0)
+            {
+                News.Text = "No images found in user's OneDrive.";
+                SlideShowControls.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            _hideControlsTimer.Start();
+            ForegroundImage.Source = BackgroundImage.Source = await LoadImage(_images[0].Id);
             Play();
+
+            _voiceCommand.AddCommands(_voiceCallbacks);
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            _hideControlsTimer.Stop();
+            _voiceCommand.RemoveCommands(_voiceCallbacks);
+        }
+
+        private void OnPointerMoved(object sender, RoutedEventArgs e)
+        {
+            if (_images != null && _images.Count != 0)
+            {
+                _hideControlsTimer.Stop();
+                _hideControlsTimer.Start();
+                SlideShowControls.Visibility = Visibility.Visible;
+            }
         }
 
         private async void StartFadeAnimation(ThreadPoolTimer timer = null)
@@ -49,12 +93,6 @@ namespace Showcase
             });
         }
 
-        private void SlideShow_Tapped(object sender, RoutedEventArgs e)
-        {
-            if (Frame.CanGoBack)
-                Frame.GoBack();
-        }
-
         private void Play()
         {
             startFadeTimer = ThreadPoolTimer.CreatePeriodicTimer(StartFadeAnimation, TimeSpan.FromMilliseconds(imageTime));
@@ -62,11 +100,20 @@ namespace Showcase
 
         private void Pause()
         {
-            startFadeTimer.Cancel();
+            startFadeTimer?.Cancel();
             startFadeTimer = null;
         }
 
-        private void Pause_Click(object sender, RoutedEventArgs e)
+        private void ResetTimer()
+        {
+            if (startFadeTimer != null)
+            {
+                Pause();
+                Play();
+            }
+        }
+
+        private void Toggle_Click(object sender, RoutedEventArgs e)
         {
             if (startFadeTimer != null)
             {
@@ -78,6 +125,19 @@ namespace Showcase
                 PlayPauseButton.Content = "\xE769";
                 Play();
             }
+        }
+
+        private void Previous_Click(object sender, RoutedEventArgs e)
+        {
+            ResetTimer();
+            currentImage = (currentImage + _images.Count - 2) % _images.Count;
+            StartFadeAnimation();
+        }
+
+        private void Next_Click(object sender, RoutedEventArgs e)
+        {
+            ResetTimer();
+            StartFadeAnimation();
         }
 
         private void SetTime_Click(object sender, RoutedEventArgs e)
@@ -143,6 +203,11 @@ namespace Showcase
                     return;
             }
             ForegroundImage.Stretch = BackgroundImage.Stretch = stretch;
+        }
+
+        private void ToggleBackground_Click(object sender, RoutedEventArgs e)
+        {
+            SetBackground(Color.FromArgb(255, 0, 0, 0));
         }
 
         private void SetBackground(Color color)

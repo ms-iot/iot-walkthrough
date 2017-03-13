@@ -48,6 +48,22 @@ namespace Showcase
             }
         }
 
+        public static async Task SendMessageAsync(ValueSet message)
+        {
+            try
+            {
+                var task = _service?.SendMessageAsync(message);
+                if (task != null)
+                {
+                    await task;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Sending message failed: " + e.Message);
+            }
+        }
+
         public static TypedEventHandler<AppServiceConnection, AppServiceRequestReceivedEventArgs> RequestReceived;
     }
 }

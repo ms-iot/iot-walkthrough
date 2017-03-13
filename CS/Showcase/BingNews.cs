@@ -109,7 +109,7 @@ namespace Showcase
 
         private HttpRequestMessage BuildRequest()
         {
-            Uri uri = new Uri(String.Format("{0}?category={1}&mkt={2}", ENDPOINT, "Sports", "en-US"));
+            Uri uri = new Uri($"{ENDPOINT}?category={"Sports"}&mkt={"en-US"}");
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, uri);
             req.Headers.Add("Ocp-Apim-Subscription-Key", _key);
             return req;

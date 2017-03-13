@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Loaded="OnLoaded">
+    Loaded="OnLoaded"
+    Unloaded="OnUnload">
 
     <Grid Name="MainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <SplitView x:Name="Splitter" IsPaneOpen="True">
@@ -17,8 +18,8 @@
                         <TextBlock Text="Click the buttons below or say voice commands to navigate" TextWrapping="Wrap" RelativePanel.Below="Header" Margin="10,10,10,10"/>
                         <Button Click="VoiceCommand_Click" Width="400" HorizontalContentAlignment="Left">Voice command</Button>
                         <Button Click="SlideShow_Click" Width="400" HorizontalContentAlignment="Left">SlideShow</Button>
-                        <Button Click="PlayMedia_Click" Width="400" HorizontalContentAlignment="Left">Play media</Button>
-                        <Button Click="WiFiConnect_Click" Width="400" HorizontalContentAlignment="Left">Connect to WiFi</Button>
+                        <Button Click="MediaPlayer_Click" Width="400" HorizontalContentAlignment="Left">Media Player</Button>
+                        <Button Click="WiFiConnection_Click" Width="400" HorizontalContentAlignment="Left">WiFi Connection</Button>
                         <Button Click="NewsAndWeather_Click" Width="400" HorizontalContentAlignment="Left">News and weather information</Button>
                     </StackPanel>
                     <StackPanel x:Name="FooterPanel" Orientation="Vertical" RelativePanel.AlignBottomWithPanel="True">
