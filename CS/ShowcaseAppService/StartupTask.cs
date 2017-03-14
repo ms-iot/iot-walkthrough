@@ -48,7 +48,7 @@ namespace ShowcaseBridgeService
                 Debug.WriteLine("ForegroundBridgeService started without details, exiting");
                 return false;
             }
-            if (!triggerDetails.Name.Equals("com.microsoft.showcase.bridge"))
+            if (!triggerDetails.Name.Equals("com.microsoft.showcase.appservice"))
             {
                 Debug.WriteLine("Trigger details name doesn't match com.microsoft.showcase.bridge, exiting");
                 return false;

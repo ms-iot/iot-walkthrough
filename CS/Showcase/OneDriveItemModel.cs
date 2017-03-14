@@ -1,6 +1,5 @@
 ﻿using Microsoft.OneDrive.Sdk;
 using System.ComponentModel;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Showcase
 {
