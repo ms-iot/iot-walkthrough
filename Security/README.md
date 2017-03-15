@@ -36,3 +36,13 @@ To generate the certificates:
 
 ## Enabling SecureBoot/BitLocker/ConfigCI
 **TODO: Public instructions and link to cab package to enable these features should be released by end of 1703. Update this page once it happens.**
+
+## Adding trusted OEM certificates
+**TODO: Public instructions at end of 1703**
+
+## Signing APPX packages
+To sign an APPX package with your pfx key, run:
+
+`signtool.exe sign /fd SHA256 /a /f <path to pfx file> .\Showcase_<version>_ARM_Debug.appx`
+
+To sign the appx before image deployment, run the command in directory `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase\AppInstall` after building the package and before building the image. [If you find any error during the procedure, see this page for information on debugging.](https://msdn.microsoft.com/en-us/library/windows/desktop/jj835836(v=vs.85).aspx)
