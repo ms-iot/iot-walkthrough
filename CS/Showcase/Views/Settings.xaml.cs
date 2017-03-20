@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Windows.Foundation.Collections;
 using Windows.UI.Xaml.Controls;
 
 namespace Showcase
@@ -116,10 +117,11 @@ namespace Showcase
             _newsCategories = new ObservableCollection<string>();
         }
 
-        private void RegionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void RegionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _newsCategories.Clear();
-            if (CATEGORIES.TryGetValue(REGIONS[(string)e.AddedItems[0]], out string[] categories))
+            var region = REGIONS[(string)e.AddedItems[0]];
+            if (CATEGORIES.TryGetValue(region, out string[] categories))
             {
                 foreach (var category in categories)
                 {
@@ -133,6 +135,10 @@ namespace Showcase
                 NewsCategoriesCombo.IsEnabled = false;
                 NewsCategoriesTextBlock.Text = "Category setting not available in this region";
             }
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigNewsRegion"] = region
+            });
         }
     }
 }
