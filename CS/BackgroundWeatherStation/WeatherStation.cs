@@ -79,10 +79,10 @@ namespace BackgroundWeatherStation
         public double ReadPressure()
         {
             /// <summary>Read pressure from MPL3115A2.
-            /// <para>Pressure is returned in Pa.</para>
+            /// <para>Pressure is returned in kPa.</para>
             /// </summary>
             int rawReading = WriteRead24(mpl3115a2, Mpl3115a2Definitions.PRESSURE_COMMAND);
-            return (rawReading >> 6) + ((rawReading >> 4) & 3) / 4.0;
+            return ((rawReading >> 6) + ((rawReading >> 4) & 3) / 4.0) / 1000.0;
         }
 
         private int WriteRead24(I2cDevice sensor, byte[] command)
