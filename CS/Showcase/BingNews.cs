@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Windows.ApplicationModel.AppService;
 using Windows.Data.Json;
+using Windows.Foundation.Collections;
 using Windows.System.Threading;
 
 namespace Showcase
@@ -10,10 +11,13 @@ namespace Showcase
     class BingNews
     {
         private const String ENDPOINT = "https://api.cognitive.microsoft.com/bing/v5.0/news/";
-        private string _key;
         private ThreadPoolTimer _timer;
         private object _timerLock = new object();
         private bool _started;
+        // Properties
+        private string _key;
+        private string _market = "en-US";
+        private string _category;
 
         public class NewsUpdateEventArgs : EventArgs
         {
@@ -30,6 +34,8 @@ namespace Showcase
         public BingNews()
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate("ConfigNewsMarket");
+            AppServiceBridge.RequestUpdate("ConfigNewsCategory");
             AppServiceBridge.RequestUpdate("bingKey");
         }
 
@@ -66,14 +72,27 @@ namespace Showcase
             }
         }
 
+        private bool TryGetValue(ValueSet set, string key, ref string target)
+        {
+            set.TryGetValue(key, out object value);
+            if (value != null)
+            {
+                target = (string)value;
+                return true;
+            }
+            return false;
+
+        }
+
         private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
-            args.Request.Message.TryGetValue("bingKey", out object key);
-            if (key != null)
+            var message = args.Request.Message;
+            if (TryGetValue(message, "bingKey", ref _key))
             {
-                _key = (string)key;
                 InitTimer();
             }
+            TryGetValue(message, "ConfigNewsMarket", ref _market);
+            TryGetValue(message, "ConfigNewsCategory", ref _category);
         }
 
         private NewsModel NewsFromJsonObject(JsonObject json)
@@ -109,7 +128,11 @@ namespace Showcase
 
         private HttpRequestMessage BuildRequest()
         {
-            Uri uri = new Uri($"{ENDPOINT}?category={"Sports"}&mkt={"en-US"}");
+            var uri = $"{ENDPOINT}?mkt={_market}";
+            if (!String.IsNullOrEmpty(_category))
+            {
+                uri += $"&category={ _category}";
+            }
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, uri);
             req.Headers.Add("Ocp-Apim-Subscription-Key", _key);
             return req;
