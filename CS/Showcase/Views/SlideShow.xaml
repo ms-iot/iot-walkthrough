@@ -29,7 +29,7 @@
             <Grid Name="ForegroundImageGrid" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True">
                 <Image x:Name="ForegroundImage" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <TextBlock Name="News" Text="Some news or weather here" Margin="50,50,50,50" Foreground="#FFFFFFFF" />
+            <TextBlock Name="ErrorTextBlock" Margin="50,50,50,50" Foreground="#FFFFFFFF" />
             <Grid Name="SlideShowControls" RelativePanel.AlignBottomWithPanel="True" Margin="20,20,20,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

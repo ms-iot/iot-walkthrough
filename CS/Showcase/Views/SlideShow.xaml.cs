@@ -53,7 +53,7 @@ namespace Showcase
 
             if (_images.Count == 0)
             {
-                News.Text = "No images found in user's OneDrive.";
+                ErrorTextBlock.Text = "No images found in user's OneDrive.";
                 SlideShowControls.Visibility = Visibility.Collapsed;
                 return;
             }
