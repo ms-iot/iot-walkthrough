@@ -1,10 +1,10 @@
 ﻿using Microsoft.Azure.Devices.Shared;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.System.Threading;
 
 namespace BackgroundWeatherStation
@@ -38,7 +38,19 @@ namespace BackgroundWeatherStation
                 Debug.WriteLine("Cancelled: reason " + reason);
             };
 
+            MemoryManager.AppMemoryUsageIncreased += MemoryManager_AppMemoryUsageIncreased;
+
             _timer = ThreadPoolTimer.CreatePeriodicTimer(LogSensorDataAsync, TimeSpan.FromSeconds(5));
+            LogSensorDataAsync(null);
+        }
+
+        private void MemoryManager_AppMemoryUsageIncreased(object sender, object e)
+        {
+            var level = MemoryManager.AppMemoryUsageLevel;
+            if (level != AppMemoryUsageLevel.Low)
+            {
+                Debug.WriteLine($"Memory limit {MemoryManager.AppMemoryUsageLevel} crossed: Current: {MemoryManager.AppMemoryUsage}, limit: {MemoryManager.AppMemoryUsageLimit}");
+            }
         }
 
         private async void LogSensorDataAsync(ThreadPoolTimer timer)
