@@ -203,8 +203,8 @@ namespace BackgroundWeatherStation
                 await _deviceClient.OpenAsync();
                 await _deviceClient.SetDesiredPropertyUpdateCallback(SendPropertyChange, null);
                 var twin = await _deviceClient.GetTwinAsync();
-                await SendPropertyChange(twin.Properties.Desired, null);
                 await SendPropertyChange(twin.Properties.Reported, null);
+                await SendPropertyChange(twin.Properties.Desired, null);
             }
             catch (Exception e)
             {

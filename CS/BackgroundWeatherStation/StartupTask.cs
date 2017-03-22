@@ -74,13 +74,20 @@ namespace BackgroundWeatherStation
 
         private async void AppServiceRequestHandler(AppServiceConnection connection, AppServiceRequestReceivedEventArgs args)
         {
-            if (args.Request.Message.TryGetValue("Config", out object config))
+            TwinCollection collection = null;
+            foreach (var pair in args.Request.Message)
             {
-                TwinCollection collection = new TwinCollection();
-                foreach (var pair in (Dictionary<string, string>)config)
+                if (pair.Key.StartsWith("Config"))
                 {
+                    if (collection == null)
+                    {
+                        collection = new TwinCollection();
+                    }
                     collection[pair.Key] = pair.Value;
                 }
+            }
+            if (collection != null)
+            {
                 await _client.UpdateReportedPropertiesAsync(collection);
             }
         }
