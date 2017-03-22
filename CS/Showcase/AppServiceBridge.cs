@@ -30,18 +30,19 @@ namespace Showcase
             {
                 RequestReceived?.Invoke(sender, args);
             };
-            _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) => { Reconnect("Service closed: " + args.Status); };
+            _service.ServiceClosed += (AppServiceConnection sender, AppServiceClosedEventArgs args) => { Reconnect($"Service closed: {args.Status}."); };
             var status = await _service.OpenAsync();
             if (status != AppServiceConnectionStatus.Success)
             {
-                Reconnect("Connection to app service failed: " + status);
+                Reconnect($"Connection to app service failed: {status}.");
             }
+            Debug.WriteLine("Connected to app service.");
         }
 
         private static void Reconnect(string reason)
         {
             _service = null;
-            _timer = ThreadPoolTimer.CreateTimer(async (ThreadPoolTimer timer) => { await InitAsync(); }, TimeSpan.FromSeconds(1));
+            _timer = ThreadPoolTimer.CreateTimer(async (ThreadPoolTimer timer) => { await InitAsync(); }, TimeSpan.FromSeconds(10));
             Debug.WriteLine(reason);
         }
 
