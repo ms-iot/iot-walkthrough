@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using Microsoft.OneDrive.Sdk;
 using Microsoft.OneDrive.Sdk.Authentication;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Showcase
             catch (ServiceException e)
             {
                 Debug.WriteLine("OneDrive auth error: " + e);
-                return;
+                throw new Exception($"OneDrive login failed: {e.Message}", e);
             }
             _oneDriveClient = new OneDriveClient(BASE_URL, authProvider);
         }
@@ -40,19 +41,40 @@ namespace Showcase
         /// <returns>Photos in the specified item ID.</returns>
         public async Task<List<OneDriveItemModel>> GetImagesAsync(string id)
         {
-            var item = string.IsNullOrEmpty(id) ? _oneDriveClient.Drive.Root : _oneDriveClient.Drive.Items[id];
-            var response = await item.Request().Expand("children").GetAsync();
-
             List<OneDriveItemModel> results = new List<OneDriveItemModel>();
-            if (response.Children == null)
+            if (_oneDriveClient == null)
             {
                 return results;
             }
-            IEnumerable<Item> items = response.Children.CurrentPage.Where(child => child.Image != null);
 
-            foreach (var child in items)
+            IItemRequestBuilder folder;
+            Item item;
+            try
             {
-                results.Add(new OneDriveItemModel(child));
+                folder = string.IsNullOrEmpty(id) ? _oneDriveClient.Drive.Root : _oneDriveClient.Drive.Items[id];
+                item = await folder.Request().Expand("children").GetAsync();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to get OneDrive folder: {e.Message}", e);
+            }
+
+            if (item.Children == null)
+            {
+                return results;
+            }
+
+            try
+            {
+                var items = item.Children.CurrentPage.Where(child => child.Image != null);
+                foreach (var child in items)
+                {
+                    results.Add(new OneDriveItemModel(child));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to enumerate images: {e.Message}", e);
             }
 
             return results;
