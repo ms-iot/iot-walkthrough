@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
 namespace Showcase
@@ -65,6 +68,7 @@ namespace Showcase
         {
             ["en-US"] = new string[]
             {
+                "All",
                 "Business",
                 "Entertainment",
                 "Entertainment - Movie And TV",
@@ -98,6 +102,7 @@ namespace Showcase
             },
             ["en-GB"] = new string[]
             {
+                "All",
                 "Business",
                 "Entertainment",
                 "Health",
@@ -109,35 +114,214 @@ namespace Showcase
             },
         };
 
+        private CoreDispatcher _uiThreadDispatcher;
+
         public Settings()
         {
             this.InitializeComponent();
 
+            _uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
             _newsRegion = new ObservableCollection<string>(REGIONS.Keys);
             _newsCategories = new ObservableCollection<string>();
+
+            AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate("ConfigNewsRegion");
+            AppServiceBridge.RequestUpdate("ConfigNewsCategory");
+            AppServiceBridge.RequestUpdate("ConfigWeatherContryCode");
+            AppServiceBridge.RequestUpdate("ConfigWeatherZipCode");
+        }
+
+        private async Task RunOnUi(DispatchedHandler f)
+        {
+            await _uiThreadDispatcher.RunAsync(CoreDispatcherPriority.Normal, f);
+        }
+
+        private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            var message = args.Request.Message;
+            if (message.TryGetValue("ConfigNewsRegion", out object region))
+            {
+                if (region == null)
+                {
+                    await RunOnUi(() => { Enable(NewsRegionCombo); });
+                }
+                else
+                {
+                    string regionName = null;
+                    foreach (var pair in REGIONS)
+                    {
+                        if (pair.Value == (string)region)
+                        {
+                            regionName = pair.Key;
+                            break;
+                        }
+                    }
+                    await RunOnUi(async () =>
+                    {
+                        if (WeatherCountryFromNewsCheckbox.IsChecked.GetValueOrDefault())
+                        {
+                            await SetWeatherCountryCodeFromNews();
+                        }
+                        WeatherCountryFromNewsCheckbox.IsEnabled = true;
+                        Enable(NewsRegionCombo, regionName);
+                        if (!CATEGORIES.ContainsKey((string)region))
+                        {
+                            SetNewsCategoryAvailable(false);
+                        }
+                    });
+                }
+            }
+            if (message.TryGetValue("ConfigNewsCategory", out object category))
+            {
+                await RunOnUi(() => {
+                    if (NewsRegionCombo.SelectedValue != null && CATEGORIES.ContainsKey(REGIONS[(string)NewsRegionCombo.SelectedValue]))
+                    {
+                        SetNewsCategoryAvailable(true);
+                        NewsCategoryCombo.SelectedItem = String.IsNullOrEmpty((string)category) ? "All" : category;
+                    }
+                    else
+                    {
+                        SetNewsCategoryAvailable(false);
+                    }
+                });
+            }
+            if (message.TryGetValue("ConfigWeatherContryCode", out object countryCode))
+            {
+                if (countryCode == null)
+                {
+                    await RunOnUi(() => { WeatherCountryTextBox.IsEnabled = true; });
+                }
+                else
+                {
+                    await RunOnUi(() =>
+                    {
+                        WeatherCountryTextBox.Text = (string)countryCode;
+                        if ((string)countryCode == GetNewsCountryCode())
+                        {
+                            WeatherCountryTextBox.IsEnabled = false;
+                            WeatherCountryFromNewsCheckbox.IsChecked = true;
+                        }
+                        else
+                        {
+                            WeatherCountryTextBox.IsEnabled = true;
+                            WeatherCountryFromNewsCheckbox.IsChecked = false;
+                        }
+                    });
+                }
+            }
+            if (message.TryGetValue("ConfigWeatherZipCode", out object zip))
+            {
+                await RunOnUi(() => { Enable(WeatherZipTextBox, (string)zip); });
+            }
         }
 
         private async void RegionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _newsCategories.Clear();
+            if (e.AddedItems.Count == 0)
+            {
+                SetNewsCategoryAvailable(false);
+                return;
+            }
             var region = REGIONS[(string)e.AddedItems[0]];
+            var configs = new ValueSet
+            {
+                ["ConfigNewsRegion"] = region
+            };
             if (CATEGORIES.TryGetValue(region, out string[] categories))
             {
                 foreach (var category in categories)
                 {
                     _newsCategories.Add(category);
                 }
-                NewsCategoriesCombo.IsEnabled = true;
-                NewsCategoriesTextBlock.Text = "Category";
+                SetNewsCategoryAvailable(true);
             }
             else
             {
-                NewsCategoriesCombo.IsEnabled = false;
-                NewsCategoriesTextBlock.Text = "Category setting not available in this region";
+                configs["ConfigNewsCategory"] = "";
+                SetNewsCategoryAvailable(false);
             }
+            WeatherCountryFromNewsCheckbox.IsEnabled = true;
+            await AppServiceBridge.SendMessageAsync(configs);
+        }
+
+        private async void NewsCategoryCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 0)
+            {
+                await AppServiceBridge.SendMessageAsync(new ValueSet
+                {
+                    ["ConfigNewsCategory"] = (string)e.AddedItems[0]
+                });
+            }
+        }
+
+        private async void WeatherCountryTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
             await AppServiceBridge.SendMessageAsync(new ValueSet
             {
-                ["ConfigNewsRegion"] = region
+                ["ConfigWeatherContryCode"] = ((TextBox)sender).Text
+            });
+        }
+
+        private async void WeatherZipTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigWeatherZipCode"] = ((TextBox)sender).Text
+            });
+        }
+
+        private async void WeatherCountryFromNewsCheckbox_Checked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            WeatherCountryTextBox.IsEnabled = false;
+            await SetWeatherCountryCodeFromNews();
+        }
+
+        private void WeatherCountryFromNewsCheckbox_Unchecked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            WeatherCountryTextBox.IsEnabled = true;
+            WeatherCountryTextBox.Text = "";
+        }
+
+        private void Enable(ComboBox box, object selectedItem = null)
+        {
+            box.IsEnabled = true;
+            box.PlaceholderText = "";
+            box.SelectedItem = selectedItem;
+        }
+
+        private void Enable(TextBox box, string text = null)
+        {
+            box.IsEnabled = true;
+            box.PlaceholderText = "";
+            box.Text = text == null ? "" : text;
+        }
+
+        private void SetNewsCategoryAvailable(bool available)
+        {
+            NewsCategoryCombo.IsEnabled = available;
+            NewsCategoryCombo.PlaceholderText = available ? "" : "Setting not available in this region";
+        }
+
+        private string GetCountryCode(string country)
+        {
+            return REGIONS[country].Split('-')[1].ToLower();
+        }
+
+        private string GetNewsCountryCode()
+        {
+            return GetCountryCode((string)NewsRegionCombo.SelectedItem);
+        }
+
+        private async Task SetWeatherCountryCodeFromNews()
+        {
+            var countryCode = GetNewsCountryCode();
+            WeatherCountryTextBox.Text = countryCode;
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigWeatherContryCode"] = countryCode
             });
         }
     }

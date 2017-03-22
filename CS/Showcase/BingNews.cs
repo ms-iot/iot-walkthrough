@@ -81,18 +81,17 @@ namespace Showcase
                 return true;
             }
             return false;
-
         }
 
         private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             var message = args.Request.Message;
+            TryGetValue(message, "ConfigNewsMarket", ref _market);
+            TryGetValue(message, "ConfigNewsCategory", ref _category);
             if (TryGetValue(message, "bingKey", ref _key))
             {
                 InitTimer();
             }
-            TryGetValue(message, "ConfigNewsMarket", ref _market);
-            TryGetValue(message, "ConfigNewsCategory", ref _category);
         }
 
         private NewsModel NewsFromJsonObject(JsonObject json)
@@ -131,7 +130,7 @@ namespace Showcase
             var uri = $"{ENDPOINT}?mkt={_market}";
             if (!String.IsNullOrEmpty(_category))
             {
-                uri += $"&category={ _category}";
+                uri += $"&category={ _category.Replace(" ", "").Replace("-", "_")}";
             }
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, uri);
             req.Headers.Add("Ocp-Apim-Subscription-Key", _key);
