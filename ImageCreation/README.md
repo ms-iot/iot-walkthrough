@@ -32,7 +32,110 @@ Choose *No* when asked whether you want to upload to the store. Choose an *Outpu
 
 Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
 
-To add a second app (for example, the background app for the weather station), use `newappxpkg`, but edit the generated manifest (at `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation\Appx.BackgroundWeatherStation.pkg.xml`) before building. Remove the lines that install `AppInstall.cmd`, `AppxConfig.cmd`, `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these files and packages will be already provided by Appx.Showcase). Then run `buildpkg Appx.BackgroundWeatherStation`.
+To add a second app (for example, the background app for the weather station), use `newappxpkg`, but do a few required changes before building. We will do changes to `AppInstall.cmd` and remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these files and packages will be already provided by Appx.Showcase).
+
+First, rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
+
+```bat
+@echo off
+
+::
+:: Ensure we execute batch script from the folder that contains the batch script
+::
+pushd %~dp0
+SETLOCAL
+
+if not exist %systemdrive%\windows\system32\deployappx.exe (
+    echo Error: deployappx.exe not found. exiting.
+    exit /b 1
+)
+
+call AppxConfigBackground.cmd
+
+echo Appx Name :%AppxName%
+
+REM Set defaults for optional parameters
+if not defined forceinstall ( set forceinstall=0 )
+if not defined launchapp ( set launchapp=1 )
+if not exist .\logs ( mkdir logs ) else ( del /Q .\logs\*.* )
+
+REM
+REM Install the Main Appx
+REM
+if %forceinstall% == 1 (
+    set INSTALL_PARAMS=install force %AppxName%.appx
+) else (
+    set INSTALL_PARAMS=install %AppxName%.appx
+)
+echo Installing %AppxName%.appx with %INSTALL_PARAMS%
+deployappx.exe %INSTALL_PARAMS% > %temp%\%AppxName%_result.txt
+if "%ERRORLEVEL%"=="0" (
+    if %launchapp% == 1 (
+        call :LAUNCH_APP
+    )
+) else (
+    echo. Error in installing %AppxName%.appx.
+    echo. Result:%ERRORLEVEL%
+)
+
+goto :CLEANUP
+
+:LAUNCH_APP
+deployappx.exe getpackageid %AppxName%.appx > .\logs\packageid.txt
+for /f "tokens=2,5 delims=:_" %%A in (.\logs\packageid.txt) do (
+    set AppxID=%%A_%%B
+)
+set AppxID=%AppxID: =%
+echo Launching %AppxID%
+REM Trigger IoTStartup
+iotstartup.exe add headless %AppxID%
+
+exit /b
+
+:SUB_CHECKERROR
+if "%ERRORLEVEL%"=="0" exit/b
+echo.
+echo Error %1
+echo Result=%ERRORLEVEL%
+echo.
+exit /b %ERRORLEVEL%
+
+:CLEANUP
+popd
+ENDLOCAL
+exit /b
+```
+
+Change the package's manifest (`Appx.BackgroundWeatherStation.pkg.xml`) to install only the app, the certificate, `AppxConfigBackground.cmd` and `AppInstallBackground.cmd`:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<Package xmlns="urn:Microsoft.WindowsPhone/PackageSchema.v8.00"
+         Owner="$(OEMNAME)" OwnerType="OEM" ReleaseType="Production"
+         Platform="arm" Component="Appx" SubComponent="BackgroundWeatherStation">
+   <Components>
+      <OSComponent>
+         <Files>
+            <File Source="AppInstall\AppInstallBackground.cmd"
+                  DestinationDir="$(runtime.root)\AppInstall"
+                  Name="AppInstallBackground.cmd" />
+            <File Source="AppInstall\AppxConfigBackground.cmd"
+                  DestinationDir="$(runtime.root)\AppInstall"
+                  Name="AppxConfigBackground.cmd" />
+            <File Source="AppInstall\BackgroundWeatherStation_1.0.3.0_ARM_Debug.appx"
+                  DestinationDir="$(runtime.root)\AppInstall"
+                  Name="BackgroundWeatherStation_1.0.3.0_ARM_Debug.appx" />
+            <File Source="AppInstall\BackgroundWeatherStation_1.0.3.0_ARM_Debug.cer"
+                  DestinationDir="$(runtime.root)\AppInstall"
+                  Name="BackgroundWeatherStation_1.0.3.0_ARM_Debug.cer" />
+         </Files>
+      </OSComponent>
+   </Components>
+</Package>
+
+```
+
+Then run `buildpkg Appx.BackgroundWeatherStation`.
 
 Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your package file to the OEM features:
 
@@ -129,7 +232,7 @@ The final manifest should look like:
       <Feature>QCDB410C_DEVICE_INFO</Feature>
       <Feature>OEM_CustomCmd</Feature>
       <Feature>OEM_ProvAuto</Feature>
-      <Feature>OEM_AppxHelloImage</Feature>
+      <Feature>OEM_AppxShowcase</Feature>
       <Feature>OEM_AppxBackgroundWeatherStation</Feature>
     </OEM>
   </Features>
@@ -137,7 +240,7 @@ The final manifest should look like:
 </OEMInput>
 ```
 
-To make your app install automatically and become the default startup app, edit `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\oemcustomization.cmd` and uncomment the lines that execute `C:\AppInstall\AppInstall.cmd`. The final script is:
+To make your app install automatically and become the default startup app, edit `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\oemcustomization.cmd` and uncomment the lines that execute `C:\AppInstall\AppInstall.cmd` and add commands to run `C:\AppInstall\AppInstallBackground.cmd`. The final script is:
 
 ```bat
 @echo off
@@ -152,15 +255,18 @@ if exist C:\OEMTools\InstallAppx.cmd (
     call C:\OEMTools\InstallAppx.cmd
 )
 
-if exist C:\AppInstall\AppInstall.cmd (
-    REM Enable Application Installation for onetime only, after this the files are deleted.
-    call C:\AppInstall\AppInstall.cmd > %temp%\AppInstallLog.txt
-    if %errorlevel%== 0 (
-        REM Cleanup Application Installation Files. Change dir to root so that the dirs can be deleted
-        cd \
-        rmdir /S /Q C:\AppInstall
-    )
+if exist C:\AppInstall\AppInstallBackground.cmd (
+    REM Install background app
+    call C:\AppInstall\AppInstallBackground.cmd > %temp%\BackgroundAppInstallLog.txt
 )
+
+if exist C:\AppInstall\AppInstall.cmd (
+    REM Install app
+    call C:\AppInstall\AppInstall.cmd > %temp%\AppInstallLog.txt
+)
+
+cd \
+rmdir /S /Q C:\OEMInstall
 ```
 
 Build the image with `buildimage Showcase Test` and your app will show up after boot!
