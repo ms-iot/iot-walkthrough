@@ -37,9 +37,6 @@ namespace Showcase
             _uiDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             SetBackground(BLACK);
 
-            AppServiceBridge.RequestReceived += PropertyUpdate;
-            AppServiceBridge.RequestUpdate(new List<string> { "ConfigSlideShowBackgroundColor", "ConfigSlideShowStrech" });
-
             _voiceCallbacks = new Dictionary<string, RoutedEventHandler>()
             {
                 { "Toggle", Toggle_Click },
@@ -55,33 +52,10 @@ namespace Showcase
             _hideControlsTimer.Interval = TimeSpan.FromSeconds(10);
         }
 
-        private async Task RunOnUi(DispatchedHandler f)
-        {
-            await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, f);
-        }
-
-        private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
-        {
-            var message = args.Request.Message;
-            if (message.TryGetValue("ConfigSlideShowBackgroundColor", out object backgroundColor))
-            {
-                _whiteBackground = (string)backgroundColor == "white";
-                await RunOnUi(() => { SetBackground(_whiteBackground ? WHITE : BLACK); });
-            }
-            if (message.TryGetValue("ConfigSlideShowStrech", out object stretch) && stretch != null)
-            {
-                await RunOnUi(() => { SetStretch((string)stretch); });
-            }
-        }
-
-        private void ShowError(string message)
-        {
-            ErrorTextBlock.Text = message;
-            SlideShowControls.Visibility = Visibility.Collapsed;
-        }
-
         private async void OnLoaded(object sender, RoutedEventArgs args)
         {
+            AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigSlideShowBackgroundColor", "ConfigSlideShowStrech" });
             try
             {
                 await _oneDrive.InitAsync();
@@ -107,10 +81,36 @@ namespace Showcase
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            AppServiceBridge.RequestReceived -= PropertyUpdate;
             Pause();
             _hideControlsTimer.Stop();
             _voiceCommand.RemoveCommands(_voiceCallbacks);
             _images = null;
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            SlideShowControls.Visibility = Visibility.Collapsed;
+        }
+
+        private async Task RunOnUi(DispatchedHandler f)
+        {
+            await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, f);
+        }
+
+        private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            var message = args.Request.Message;
+            if (message.TryGetValue("ConfigSlideShowBackgroundColor", out object backgroundColor))
+            {
+                _whiteBackground = (string)backgroundColor == "white";
+                await RunOnUi(() => { SetBackground(_whiteBackground ? WHITE : BLACK); });
+            }
+            if (message.TryGetValue("ConfigSlideShowStrech", out object stretch) && stretch != null)
+            {
+                await RunOnUi(() => { SetStretch((string)stretch); });
+            }
         }
 
         private void OnPointerMoved(object sender, RoutedEventArgs e)
