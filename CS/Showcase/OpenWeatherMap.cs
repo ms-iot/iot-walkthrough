@@ -33,8 +33,8 @@ namespace Showcase
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
             AppServiceBridge.RequestUpdate("OpenWeatherMapKey");
-            AppServiceBridge.RequestUpdate("OpenWeatherMapZip");
-            AppServiceBridge.RequestUpdate("OpenWeatherMapCountry");
+            AppServiceBridge.RequestUpdate("ConfigWeatherZipCode");
+            AppServiceBridge.RequestUpdate("ConfigWeatherContryCode");
         }
 
         public void Start()
@@ -84,7 +84,7 @@ namespace Showcase
         private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             // If some value was changed, set timer to update weather
-            if (TryUpdate(args, "OpenWeatherMapZip", ref _zip) | TryUpdate(args, "OpenWeatherMapCountry", ref _country) | TryUpdate(args, "OpenWeatherMapKey", ref _key))
+            if (TryUpdate(args, "ConfigWeatherZipCode", ref _zip) | TryUpdate(args, "ConfigWeatherContryCode", ref _country) | TryUpdate(args, "OpenWeatherMapKey", ref _key))
             {
                 InitTimer();
             }

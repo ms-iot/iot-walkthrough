@@ -119,7 +119,7 @@ namespace Showcase
 
         private string FormatPressure(double pressure)
         {
-            return pressure.ToString("N0") + " Pa";
+            return pressure.ToString("N1") + " kPa";
         }
     }
 }

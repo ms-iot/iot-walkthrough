@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.AppService;
+using Windows.Foundation.Collections;
 using Windows.System.Threading;
 using Windows.UI;
 using Windows.UI.Core;
@@ -15,21 +17,28 @@ namespace Showcase
 {
     public sealed partial class SlideShow : Page
     {
+        private readonly Color BLACK = Color.FromArgb(255, 0, 0, 0);
+        private readonly Color WHITE = Color.FromArgb(255, 255, 255, 255);
+
         private int currentImage = 0;
         private int imageTime = 10000;
         private ThreadPoolTimer startFadeTimer;
         private DispatcherTimer _hideControlsTimer;
-        private CoreDispatcher uiDispatcher;
+        private CoreDispatcher _uiDispatcher;
         private OneDriveItemController _oneDrive = new OneDriveItemController();
         private List<OneDriveItemModel> _images;
         private VoiceCommand _voiceCommand = new VoiceCommand();
         private Dictionary<string, RoutedEventHandler> _voiceCallbacks;
+        private bool _whiteBackground;
 
         public SlideShow()
         {
             this.InitializeComponent();
-            uiDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            SetBackground(Color.FromArgb(255, 255, 255, 255));
+            _uiDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            SetBackground(BLACK);
+
+            AppServiceBridge.RequestReceived += PropertyUpdate;
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigSlideShowBackgroundColor", "ConfigSlideShowStrech" });
 
             _voiceCallbacks = new Dictionary<string, RoutedEventHandler>()
             {
@@ -46,15 +55,46 @@ namespace Showcase
             _hideControlsTimer.Interval = TimeSpan.FromSeconds(10);
         }
 
-        private async void OnLoaded(object sender, RoutedEventArgs e)
+        private async Task RunOnUi(DispatchedHandler f)
         {
-            await _oneDrive.InitAsync();
-            _images = await _oneDrive.GetImagesAsync(null);
+            await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, f);
+        }
 
+        private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            var message = args.Request.Message;
+            if (message.TryGetValue("ConfigSlideShowBackgroundColor", out object backgroundColor))
+            {
+                _whiteBackground = (string)backgroundColor == "white";
+                await RunOnUi(() => { SetBackground(_whiteBackground ? WHITE : BLACK); });
+            }
+            if (message.TryGetValue("ConfigSlideShowStrech", out object stretch) && stretch != null)
+            {
+                await RunOnUi(() => { SetStretch((string)stretch); });
+            }
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            SlideShowControls.Visibility = Visibility.Collapsed;
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                await _oneDrive.InitAsync();
+                _images = await _oneDrive.GetImagesAsync(null);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+                return;
+            }
             if (_images.Count == 0)
             {
-                News.Text = "No images found in user's OneDrive.";
-                SlideShowControls.Visibility = Visibility.Collapsed;
+                ShowError("No images found in user's OneDrive.");
                 return;
             }
 
@@ -67,8 +107,10 @@ namespace Showcase
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            Pause();
             _hideControlsTimer.Stop();
             _voiceCommand.RemoveCommands(_voiceCallbacks);
+            _images = null;
         }
 
         private void OnPointerMoved(object sender, RoutedEventArgs e)
@@ -83,14 +125,17 @@ namespace Showcase
 
         private async void StartFadeAnimation(ThreadPoolTimer timer = null)
         {
-            await uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            if (_images != null)
             {
-                ForegroundImage.Source = BackgroundImage.Source;
-                ForegroundImage.Opacity = 1;
-                currentImage = (currentImage + 1) % _images.Count;
-                BackgroundImage.Source = await LoadImage(_images[currentImage].Id);
-                SlideShowFade.Begin();
-            });
+                await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    ForegroundImage.Source = BackgroundImage.Source;
+                    ForegroundImage.Opacity = 1;
+                    currentImage = (currentImage + 1) % _images.Count;
+                    BackgroundImage.Source = await LoadImage(_images[currentImage].Id);
+                    SlideShowFade.Begin();
+                });
+            }
         }
 
         private void Play()
@@ -175,12 +220,11 @@ namespace Showcase
             SetStretchTypePopup.IsOpen = true;
         }
 
-        private void SetStretchTypePopup_ItemClick(object sender, ItemClickEventArgs e)
+        private void SetStretch(string stretchName)
         {
-            TextBlock item = e.ClickedItem as TextBlock;
             Stretch stretch;
 
-            switch (item.Text)
+            switch (stretchName)
             {
                 case "None":
                     stretch = Stretch.None;
@@ -199,15 +243,30 @@ namespace Showcase
                     break;
 
                 default:
-                    Debug.WriteLine("Unknown popup option " + item.Text + "selected");
+                    Debug.WriteLine($"Unknown stretch {stretchName} selected");
                     return;
             }
             ForegroundImage.Stretch = BackgroundImage.Stretch = stretch;
         }
 
-        private void ToggleBackground_Click(object sender, RoutedEventArgs e)
+        private async void SetStretchTypePopup_ItemClick(object sender, ItemClickEventArgs e)
         {
-            SetBackground(Color.FromArgb(255, 0, 0, 0));
+            var stretch = ((TextBlock)e.ClickedItem).Text;
+            SetStretch(stretch);
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigSlideShowStrech"] = stretch
+            });
+        }
+
+        private async void ToggleBackground_Click(object sender, RoutedEventArgs e)
+        {
+            _whiteBackground = !_whiteBackground;
+            SetBackground(_whiteBackground ? WHITE : BLACK);
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigSlideShowBackgroundColor"] = _whiteBackground ? "white" : "black"
+            });
         }
 
         private void SetBackground(Color color)

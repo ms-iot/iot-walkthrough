@@ -136,9 +136,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ShowcaseBridgeService\ShowcaseBridgeService.csproj">
+    <ProjectReference Include="..\ShowcaseAppService\ShowcaseAppService.csproj">
       <Project>{818829cb-f171-40c4-9347-46b52305c0c3}</Project>
-      <Name>ShowcaseBridgeService</Name>
+      <Name>ShowcaseAppService</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

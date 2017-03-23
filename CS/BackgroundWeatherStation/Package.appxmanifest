@@ -42,7 +42,7 @@
       </uap:VisualElements>
       <Extensions>
         <uap:Extension Category="windows.appService" EntryPoint="ShowcaseBridgeService.StartupTask">
-          <uap:AppService Name="com.microsoft.showcase.bridge" />
+          <uap:AppService Name="com.microsoft.showcase.appservice" />
         </uap:Extension>
         <Extension Category="windows.backgroundTasks" EntryPoint="BackgroundWeatherStation.StartupTask">
           <BackgroundTasks>

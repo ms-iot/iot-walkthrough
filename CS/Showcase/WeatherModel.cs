@@ -2,25 +2,25 @@
 {
     class WeatherModel
     {
-        public double Temperature { get { return temperature; } }
-        public double Humidity { get { return humidity; } }
-        public double Pressure { get { return pressure; } }
-        public string Condition { get { return condition; } }
-        public string Icon { get { return icon; } }
+        public double Temperature { get { return _temperature; } }
+        public double Humidity { get { return _humidity; } }
+        public double Pressure { get { return _pressure; } }
+        public string Condition { get { return _condition; } }
+        public string Icon { get { return _icon; } }
 
-        private double temperature;
-        private double humidity;
-        private double pressure;
-        private string condition;
-        private string icon;
+        private double _temperature;
+        private double _humidity;
+        private double _pressure;
+        private string _condition;
+        private string _icon;
 
         public WeatherModel(double temperature, double humidity, double pressure, string condition, string icon)
         {
-            this.temperature = temperature;
-            this.humidity = humidity;
-            this.pressure = pressure;
-            this.condition = condition;
-            this.icon = icon;
+            _temperature = temperature;
+            _humidity = humidity;
+            _pressure = pressure;
+            _condition = condition;
+            _icon = icon;
         }
     }
 }

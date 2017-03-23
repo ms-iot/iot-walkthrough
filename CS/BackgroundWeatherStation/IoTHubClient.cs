@@ -25,6 +25,7 @@ namespace BackgroundWeatherStation
         private SemaphoreSlim _deviceClientSemaphore = new SemaphoreSlim(1);
         private String _id;
         private ConcurrentQueue<Message> _pendingMessages = new ConcurrentQueue<Message>();
+        private int _errorCount;
 
         public async Task InitAsync()
         {
@@ -146,6 +147,7 @@ namespace BackgroundWeatherStation
             try
             {
                 operation(_deviceClient);
+                _errorCount = 0;
             }
             catch (UnauthorizedException)
             {
@@ -155,6 +157,21 @@ namespace BackgroundWeatherStation
                     throw new UnauthorizedException("Failed to refresh Azure connection");
                 }
                 operation(_deviceClient);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Azure error: {e.Message}.");
+                _errorCount++;
+                if (_errorCount > 5)
+                {
+                    Debug.WriteLine("Too many failed Azure operations, refreshing connection.");
+                    if (!await TryRefreshTokenAsync())
+                    {
+                        throw new Exception($"Failed to refresh Azure connection after error {e.Message}.", e);
+                    }
+                    operation(_deviceClient);
+                    _errorCount = 0;
+                }
             }
         }
 
@@ -168,7 +185,7 @@ namespace BackgroundWeatherStation
                 {
                     throw new Exception("TPM generated empty token");
                 }
-                method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, _tpm.GetSASToken());
+                method = AuthenticationMethodFactory.CreateAuthenticationWithToken(_id, token);
             }
             catch (Exception e)
             {
@@ -186,8 +203,8 @@ namespace BackgroundWeatherStation
                 await _deviceClient.OpenAsync();
                 await _deviceClient.SetDesiredPropertyUpdateCallback(SendPropertyChange, null);
                 var twin = await _deviceClient.GetTwinAsync();
-                await SendPropertyChange(twin.Properties.Desired, null);
                 await SendPropertyChange(twin.Properties.Reported, null);
+                await SendPropertyChange(twin.Properties.Desired, null);
             }
             catch (Exception e)
             {
