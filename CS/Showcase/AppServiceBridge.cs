@@ -35,6 +35,7 @@ namespace Showcase
             if (status != AppServiceConnectionStatus.Success)
             {
                 Reconnect($"Connection to app service failed: {status}.");
+                return;
             }
             Debug.WriteLine("Connected to app service.");
         }
