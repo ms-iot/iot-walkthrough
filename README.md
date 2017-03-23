@@ -24,7 +24,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Installing IoT templates and deploying a background app](Background/Installation/README.md)
     * [Collecting sensor data through I2C](Background/Sensing/README.md)
 3. Foreground application
-    * Creating a foreground application
+    * [Creating a foreground application](Foreground/Creating/README.md)
     * Usage of text-to-speech
     * Receiving voice commands
     * Showing a slideshow
