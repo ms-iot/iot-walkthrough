@@ -271,7 +271,7 @@ namespace Showcase
 
         private void SetBackground(Color color)
         {
-            ForegroundImageGrid.Background = MainGrid.Background = new SolidColorBrush(color);
+            ForegroundImageGrid.Background = ImageGrid.Background = new SolidColorBrush(color);
         }
 
         private async Task<BitmapImage> LoadImage(string id)
