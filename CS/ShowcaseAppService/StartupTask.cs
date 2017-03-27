@@ -28,7 +28,7 @@ namespace ShowcaseBridgeService
         public void Run(IBackgroundTaskInstance taskInstance)
         {
             taskInstance.Canceled += OnTaskCanceled;
-            Debug.WriteLine("ShowcaseBridgeService FamilyName: " + Windows.ApplicationModel.Package.Current.Id.FamilyName);
+            Debug.WriteLine($"ShowcaseBridgeService FamilyName: {Windows.ApplicationModel.Package.Current.Id.FamilyName}.");
 
             if (_valueStorage == null)
             {
@@ -45,15 +45,15 @@ namespace ShowcaseBridgeService
         {
             if (triggerDetails == null)
             {
-                Debug.WriteLine("ForegroundBridgeService started without details, exiting");
+                Debug.WriteLine("ForegroundBridgeService started without details, exiting.");
                 return false;
             }
             if (!triggerDetails.Name.Equals("com.microsoft.showcase.appservice"))
             {
-                Debug.WriteLine("Trigger details name doesn't match com.microsoft.showcase.bridge, exiting");
+                Debug.WriteLine("Trigger details name doesn't match com.microsoft.showcase.bridge, exiting.");
                 return false;
             }
-            Debug.WriteLine("New service connection");
+            Debug.WriteLine("New service connection.");
             _connection = triggerDetails.AppServiceConnection;
             _connection.RequestReceived += OnRequestReceived;
             ValueChanged += BroadcastReceivedMessage;
@@ -63,7 +63,7 @@ namespace ShowcaseBridgeService
 
         private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
-           Debug.WriteLine("Cancellation, reason: " + reason);
+           Debug.WriteLine($"Cancellation, reason: {reason}.");
            ValueChanged -= BroadcastReceivedMessage;
            if (_deferral != null)
            {
