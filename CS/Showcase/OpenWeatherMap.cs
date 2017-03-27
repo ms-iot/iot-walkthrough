@@ -102,7 +102,7 @@ namespace Showcase
             JsonObject weatherJson = json.GetNamedArray("weather").GetObjectAt(0);
             string description = weatherJson.GetNamedString("main") + " - " + weatherJson.GetNamedString("description");
             var weather = new WeatherModel(mainJson.GetNamedNumber("temp") - 273.15, mainJson.GetNamedNumber("humidity"),
-                mainJson.GetNamedNumber("pressure") * 100, description, String.Format("http://openweathermap.org/img/w/{0}.png", weatherJson.GetNamedString("icon")));
+                mainJson.GetNamedNumber("pressure") / 10, description, String.Format("http://openweathermap.org/img/w/{0}.png", weatherJson.GetNamedString("icon")));
             WeatherUpdate?.Invoke(this, new WeatherUpdateEventArgs(weather));
         }
 

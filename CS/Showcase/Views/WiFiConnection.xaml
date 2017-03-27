@@ -55,33 +55,31 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid Grid.Column="0" Grid.Row="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="12,20,12,50">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <RelativePanel Grid.Column="0" Margin="12,12,12,12">
-                <StackPanel>
-                    <TextBlock Text="WiFi connection" FontSize="20" />
-                    <TextBlock Name="ConnectionStatusText" TextWrapping="Wrap"/>
-                </StackPanel>
-                <Button Name="ScanButton" Click="Scan_Click" RelativePanel.AlignBottomWithPanel="True">Scan networks</Button>
-            </RelativePanel>
-            <RelativePanel Grid.Column="1">
-                <ListView x:Name="ResultsListView" ItemTemplate="{StaticResource ResultsListViewTemplate}" SelectionChanged="ResultsListView_SelectionChanged" HorizontalAlignment="Left" />
-            </RelativePanel>
-            <StackPanel x:Name="ConnectionControls" Grid.Column="2" Visibility="Collapsed" VerticalAlignment="Center" Margin="12,12,12,12">
-                <StackPanel x:Name="NetworkKeyInfo" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
-                    <TextBlock Text="Security Key:" Margin="5,0,5,0" HorizontalAlignment="Left"/>
-                    <PasswordBox x:Name="NetworkKey" Width="124" Margin="5,0,10,0" Height="23" HorizontalAlignment="Left"/>
-                </StackPanel>
-                <CheckBox Name="IsAutomaticReconnection"> Reconnect automatically</CheckBox>
-                <Button Click="Connect_Click">Connect</Button>
+    <Grid Grid.Column="0" Grid.Row="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="12,20,12,50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <RelativePanel Grid.Column="0" Margin="12,12,12,12">
+            <StackPanel>
+                <TextBlock Text="WiFi connection" FontSize="20" />
+                <TextBlock Name="ConnectionStatusText" TextWrapping="Wrap"/>
             </StackPanel>
-            <WebView Source="http://www.bing.com" Grid.Column="3" Visibility="Collapsed" Name="webView" />
-        </Grid>
+            <Button Name="ScanButton" Click="Scan_Click" RelativePanel.AlignBottomWithPanel="True">Scan networks</Button>
+        </RelativePanel>
+        <RelativePanel Grid.Column="1">
+            <ListView x:Name="ResultsListView" ItemTemplate="{StaticResource ResultsListViewTemplate}" SelectionChanged="ResultsListView_SelectionChanged" HorizontalAlignment="Left" />
+        </RelativePanel>
+        <StackPanel x:Name="ConnectionControls" Grid.Column="2" Visibility="Collapsed" VerticalAlignment="Center" Margin="12,12,12,12">
+            <StackPanel x:Name="NetworkKeyInfo" Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
+                <TextBlock Text="Security Key:" Margin="5,0,5,0" HorizontalAlignment="Left"/>
+                <PasswordBox x:Name="NetworkKey" Width="124" Margin="5,0,10,0" Height="23" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <CheckBox Name="IsAutomaticReconnection">Reconnect automatically</CheckBox>
+            <Button Click="Connect_Click">Connect</Button>
+        </StackPanel>
+        <WebView Source="http://www.bing.com" Grid.Column="3" Visibility="Collapsed" Name="webView" />
     </Grid>
 </Page>

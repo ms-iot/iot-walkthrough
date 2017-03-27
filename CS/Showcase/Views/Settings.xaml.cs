@@ -124,12 +124,17 @@ namespace Showcase
 
             _newsRegion = new ObservableCollection<string>(REGIONS.Keys);
             _newsCategories = new ObservableCollection<string>();
+        }
 
+        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
             AppServiceBridge.RequestReceived += PropertyUpdate;
-            AppServiceBridge.RequestUpdate("ConfigNewsRegion");
-            AppServiceBridge.RequestUpdate("ConfigNewsCategory");
-            AppServiceBridge.RequestUpdate("ConfigWeatherContryCode");
-            AppServiceBridge.RequestUpdate("ConfigWeatherZipCode");
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigNewsMarket", "ConfigNewsCategory", "ConfigWeatherContryCode", "ConfigWeatherZipCode" });
+        }
+
+        private void OnUnloaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            AppServiceBridge.RequestReceived -= PropertyUpdate;
         }
 
         private async Task RunOnUi(DispatchedHandler f)
@@ -140,7 +145,7 @@ namespace Showcase
         private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             var message = args.Request.Message;
-            if (message.TryGetValue("ConfigNewsRegion", out object region))
+            if (message.TryGetValue("ConfigNewsMarket", out object region))
             {
                 if (region == null)
                 {
@@ -227,7 +232,7 @@ namespace Showcase
             var region = REGIONS[(string)e.AddedItems[0]];
             var configs = new ValueSet
             {
-                ["ConfigNewsRegion"] = region
+                ["ConfigNewsMarket"] = region
             };
             if (CATEGORIES.TryGetValue(region, out string[] categories))
             {
@@ -250,9 +255,10 @@ namespace Showcase
         {
             if (e.AddedItems.Count != 0)
             {
+                var newValue = (string)e.AddedItems[0];
                 await AppServiceBridge.SendMessageAsync(new ValueSet
                 {
-                    ["ConfigNewsCategory"] = (string)e.AddedItems[0]
+                    ["ConfigNewsCategory"] = newValue == "All" ? "" : newValue
                 });
             }
         }
@@ -312,17 +318,21 @@ namespace Showcase
 
         private string GetNewsCountryCode()
         {
-            return GetCountryCode((string)NewsRegionCombo.SelectedItem);
+            var region = (string)NewsRegionCombo.SelectedItem;
+            return region == null ? null : GetCountryCode(region);
         }
 
         private async Task SetWeatherCountryCodeFromNews()
         {
             var countryCode = GetNewsCountryCode();
-            WeatherCountryTextBox.Text = countryCode;
-            await AppServiceBridge.SendMessageAsync(new ValueSet
+            if (countryCode != null)
             {
-                ["ConfigWeatherContryCode"] = countryCode
-            });
+                WeatherCountryTextBox.Text = countryCode;
+                await AppServiceBridge.SendMessageAsync(new ValueSet
+                {
+                    ["ConfigWeatherContryCode"] = countryCode
+                });
+            }
         }
     }
 }

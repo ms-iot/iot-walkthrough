@@ -36,6 +36,7 @@ namespace BackgroundWeatherStation
             taskInstance.Canceled += (IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) =>
             {
                 Debug.WriteLine("Cancelled: reason " + reason);
+                _deferral.Complete();
             };
 
             MemoryManager.AppMemoryUsageIncreased += MemoryManager_AppMemoryUsageIncreased;

@@ -85,11 +85,7 @@ namespace Showcase
                 ConnectionStatusText.Text = "No network selected";
                 return;
             }
-            WiFiReconnectionKind reconnectionKind = WiFiReconnectionKind.Manual;
-            if (IsAutomaticReconnection.IsChecked.HasValue && IsAutomaticReconnection.IsChecked == true)
-            {
-                reconnectionKind = WiFiReconnectionKind.Automatic;
-            }
+            WiFiReconnectionKind reconnectionKind = IsAutomaticReconnection.IsChecked.GetValueOrDefault() ? WiFiReconnectionKind.Automatic : WiFiReconnectionKind.Manual;
 
             WiFiConnectionResult result;
             if (selectedNetwork.AvailableNetwork.SecuritySettings.NetworkAuthenticationType == NetworkAuthenticationType.Open80211 &&
