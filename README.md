@@ -30,8 +30,8 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * Showing a slideshow
     * Playing media
 4. Inter-application communication
-    * Creating an app service
-    * Connecting to the app service
+    * [Creating an app service](AppService/Creation/README.md)
+    * Communication between applications
     * Showing local weather data
 5. Connecting to the Azure cloud
     * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution/README.md)
