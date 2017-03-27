@@ -12,22 +12,19 @@ namespace BackgroundWeatherStation
     {
         private static AppServiceConnection _service;
 
-        public static async Task InitAsync(TypedEventHandler<AppServiceConnection, AppServiceRequestReceivedEventArgs> handler = null)
+        public static async Task InitAsync()
         {
             Debug.WriteLine("Opening service");
             _service = AppServiceConnectionFactory.GetConnection();
             var serviceStatus = await _service.OpenAsync();
-            // Should never fail, since app service is installed with the background app
-            Debug.Assert(serviceStatus == AppServiceConnectionStatus.Success, "Opening service failed: " + serviceStatus);
+            // Should never fail, since app service is installed with the background app.
+            Debug.Assert(serviceStatus == AppServiceConnectionStatus.Success, $"Opening service failed: {serviceStatus}.");
 
-            if (handler != null)
-            {
-                _service.RequestReceived += handler;
-            }
+            _service.RequestReceived += (AppServiceConnection sender, AppServiceRequestReceivedEventArgs args) => RequestReceived(sender, args);
             _service.ServiceClosed += async (AppServiceConnection sender, AppServiceClosedEventArgs args) =>
             {
                 _service = null;
-                Debug.WriteLine("Service closed: " + args.Status);
+                Debug.WriteLine($"Service closed: {args.Status}.");
                 await InitAsync();
             };
         }
@@ -43,13 +40,15 @@ namespace BackgroundWeatherStation
                 }
                 else
                 {
-                    Debug.WriteLine("Service returned null task");
+                    Debug.WriteLine("Skipping message: App service connection is null.");
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Sending message failed: " + e.Message);
+                Debug.WriteLine($"Sending message failed: {e.Message}.");
             }
         }
+
+        public static TypedEventHandler<AppServiceConnection, AppServiceRequestReceivedEventArgs> RequestReceived;
     }
 }
