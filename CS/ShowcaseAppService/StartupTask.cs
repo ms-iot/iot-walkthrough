@@ -6,24 +6,14 @@ using Windows.Foundation.Collections;
 
 namespace ShowcaseBridgeService
 {
-    class ValueChangedEventArgs : EventArgs
-    {
-        private ValueSet _changedValues;
-
-        public ValueChangedEventArgs(ValueSet changedValues)
-        {
-            _changedValues = changedValues;
-        }
-
-        public ValueSet ChangedValues { get { return _changedValues; } }
-    }
-
     public sealed class StartupTask : IBackgroundTask
     {
         private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
         private static ValueSet _valueStorage;
-        private static EventHandler ValueChanged;
+
+        private delegate void ValueChangedHandler(ValueSet args);
+        private static ValueChangedHandler ValueChanged;
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
@@ -71,9 +61,9 @@ namespace ShowcaseBridgeService
            }
         }
 
-        private async void BroadcastReceivedMessage(object sender, EventArgs args)
+        private async void BroadcastReceivedMessage(ValueSet changedValues)
         {
-            await _connection.SendMessageAsync(((ValueChangedEventArgs)args).ChangedValues);
+            await _connection.SendMessageAsync(changedValues);
         }
 
         private async void OnRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -97,7 +87,7 @@ namespace ShowcaseBridgeService
             }
             if (values.Count != 0)
             {
-                ValueChanged?.Invoke(this, new ValueChangedEventArgs(values));
+                ValueChanged?.Invoke(values);
             }
             if (requestedValues.Count != 0)
             {
