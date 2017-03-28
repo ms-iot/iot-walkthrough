@@ -14,9 +14,8 @@ Download the DragonBoard packages by contacting a Qualcomm provider.  Save them 
 
 ## Creating a basic image
 
-[Follow the instructions here](https://msdn.microsoft.com/windows/hardware/commercialize/manufacture/iot/create-a-basic-image) up to *Create a test project*. The name *Showcase* will be assumed for the rest of the tutorial; if your project has a different name, replace it accordingly. The default ARM setup targets a Raspberry Pi and a few changes are required to build for a DragonBoard:
+[Follow the instructions here](https://msdn.microsoft.com/windows/hardware/commercialize/manufacture/iot/create-a-basic-image) up to *Create a test project*. The name *Showcase* will be assumed for the rest of the tutorial; if your project has a different name, replace it accordingly. The default ARM setup targets a Raspberry Pi; to target a DragonBoard, use `newproduct Showcase QCDB410C`. Now, to create and run a basic test image:
 
-* Copy the contents of `C:\IoT-ADK-AddonKit\Source-arm\BSP\QCDB410C\OEMInputSamples\TestOEMInput.xml` to `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml`.
 * Run `buildimage Showcase Test`. A FFU image will be available at `C:\IoT-ADK-AddonKit\Build\arm\Showcase\Test`.
 * Flash it to the DragonBoard using the `DragonBoardUpdateTool`. [More instructions are available here](https://developer.microsoft.com/en-us/windows/iot/docs/getstarted/dragonboard/getstartedstep2).
 
@@ -34,9 +33,9 @@ Choose *No* when asked whether you want to upload to the store. Choose an *Outpu
 
 Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
 
-To add a second app (for example, the background app for the weather station), use `newappxpkg <Path to BackgroundWeatherStation> Appx.BackgroundWeatherStation`, but do a few required changes before building.
+To add a second app (for example, the background app for the weather station), use `newappxpkg <Path to BackgroundWeatherStation appx> Appx.BackgroundWeatherStation`, but do a few required changes before building.
 
-First, go to directory `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation`. Remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these packages will be already provided by Appx.Showcase). Rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
+First, go to the package's folder, `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation`. In the `AppInstall` folder, remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these packages will be already provided by Appx.Showcase). Rename `AppxConfig.cmd` to `AppxConfigBackground.cmd`. Rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
 
 ```bat
 @echo off
@@ -108,7 +107,7 @@ ENDLOCAL
 exit /b
 ```
 
-Change the package's manifest (`Appx.BackgroundWeatherStation.pkg.xml`) to install only the app, the certificate, `AppxConfigBackground.cmd` and `AppInstallBackground.cmd`:
+Change the package's manifest (`Appx.BackgroundWeatherStation.pkg.xml` in the package's folder) to install only the app, the certificate, `AppxConfigBackground.cmd` and `AppInstallBackground.cmd`:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
