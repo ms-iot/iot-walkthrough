@@ -272,3 +272,9 @@ rmdir /S /Q C:\OEMInstall
 ```
 
 Build the image with `buildimage Showcase Test` and your app will show up after boot!
+
+## Updating apps
+
+To update apps in deployed boards, submit a new version in the Store. A job on the board will check the Store every 24 hours and install updates. [For more information, see the Updating an App section on the store docs.](https://developer.microsoft.com/en-us/windows/iot/docs/store)
+
+Your application can also use an API in the `Windows.Services.Store` namespace to check for new versions and do updates. [Documentation and sample code can be found here.](https://docs.microsoft.com/en-us/windows/uwp/packaging/self-install-package-updates)
