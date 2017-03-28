@@ -16,7 +16,7 @@ It is very easy to create an app on the Windows Store:
 * [Go to the developer dashboard.](https://developer.microsoft.com/en-us/dashboard)
 * Click the *Create a new app* button and choose a name. Click *Reserve product name*.
 
-![Creating a new app](Creating new app.png)
+![Creating a new app](CreatingNewApp.png)
 
 That's all! To get the Package Family Name, click *App management* and choose the *App identity* sub-item. Take note of this identifier, which will be used when connecting to the app service.
 
@@ -26,4 +26,4 @@ That's all! To get the Package Family Name, click *App management* and choose th
 
 Whenever you need to associate your app with the Store, right click your project and choose *Store > Associate App with the Store...* and follow the instructions. You will have to login with the same Microsoft account used to create the app.
 
-![Associating with Store](Associating with Store.png)
+![Associating with Store](AssociatingWithStore.png)

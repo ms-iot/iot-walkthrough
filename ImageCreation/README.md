@@ -26,9 +26,11 @@ Download the DragonBoard packages by contacting a Qualcomm provider.  Save them 
 
 Open your solution, right click the desired project and choose *Store > Create App Packages...*.
 
-![Creating App Package.png](Creating App Package.png)
+![Creating an app package](CreatingAppPackage.png)
 
 Choose *No* when asked whether you want to upload to the store. Choose an *Output location* without spaces, *Never* at *Generate app bundle* and keep the *ARM* architecture in *Debug* or *Release* mode.
+
+![Package configuration](PackageConfiguration.png)
 
 Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
 

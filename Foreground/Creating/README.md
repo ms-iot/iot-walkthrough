@@ -10,11 +10,11 @@ Now we will create a blank foreground application. Features will be added as we 
 
 Right click your solution and choose *Add > New Project...*. Choose *Visual C# > Windows Universal* and name it *Showcase*.
 
-![New project.png](New project.png)
+![New project.png](NewProject.png)
 
 * We will create a navigation pane and a `Frame` in the main page. The `Frame` will show the main content to the user and the navigation pane will allow navigation between pages.
 
-![Navigation pane](Navigation pane.png)
+![Navigation pane](NavigationPane.png)
 
 * The layout is made of a `SplitView` containing `StackPanel`s for the buttons in its `Pane` and a `Frame` in its `Content`, named `ContentFrame`, that will keep the current page. [The XAML can be seen here.](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/Views/MainPage.xaml)
 
