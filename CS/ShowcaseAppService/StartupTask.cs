@@ -6,29 +6,19 @@ using Windows.Foundation.Collections;
 
 namespace ShowcaseBridgeService
 {
-    class ValueChangedEventArgs : EventArgs
-    {
-        private ValueSet _changedValues;
-
-        public ValueChangedEventArgs(ValueSet changedValues)
-        {
-            _changedValues = changedValues;
-        }
-
-        public ValueSet ChangedValues { get { return _changedValues; } }
-    }
-
     public sealed class StartupTask : IBackgroundTask
     {
         private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
         private static ValueSet _valueStorage;
-        private static EventHandler ValueChanged;
+
+        private delegate void ValueChangedHandler(ValueSet args);
+        private static ValueChangedHandler ValueChanged;
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
             taskInstance.Canceled += OnTaskCanceled;
-            Debug.WriteLine("ShowcaseBridgeService FamilyName: " + Windows.ApplicationModel.Package.Current.Id.FamilyName);
+            Debug.WriteLine($"ShowcaseBridgeService FamilyName: {Windows.ApplicationModel.Package.Current.Id.FamilyName}.");
 
             if (_valueStorage == null)
             {
@@ -45,15 +35,15 @@ namespace ShowcaseBridgeService
         {
             if (triggerDetails == null)
             {
-                Debug.WriteLine("ForegroundBridgeService started without details, exiting");
+                Debug.WriteLine("ForegroundBridgeService started without details, exiting.");
                 return false;
             }
             if (!triggerDetails.Name.Equals("com.microsoft.showcase.appservice"))
             {
-                Debug.WriteLine("Trigger details name doesn't match com.microsoft.showcase.bridge, exiting");
+                Debug.WriteLine("Trigger details name doesn't match com.microsoft.showcase.bridge, exiting.");
                 return false;
             }
-            Debug.WriteLine("New service connection");
+            Debug.WriteLine("New service connection.");
             _connection = triggerDetails.AppServiceConnection;
             _connection.RequestReceived += OnRequestReceived;
             ValueChanged += BroadcastReceivedMessage;
@@ -63,7 +53,7 @@ namespace ShowcaseBridgeService
 
         private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
-           Debug.WriteLine("Cancellation, reason: " + reason);
+           Debug.WriteLine($"Cancellation, reason: {reason}.");
            ValueChanged -= BroadcastReceivedMessage;
            if (_deferral != null)
            {
@@ -71,9 +61,9 @@ namespace ShowcaseBridgeService
            }
         }
 
-        private async void BroadcastReceivedMessage(object sender, EventArgs args)
+        private async void BroadcastReceivedMessage(ValueSet changedValues)
         {
-            await _connection.SendMessageAsync(((ValueChangedEventArgs)args).ChangedValues);
+            await _connection.SendMessageAsync(changedValues);
         }
 
         private async void OnRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -97,7 +87,7 @@ namespace ShowcaseBridgeService
             }
             if (values.Count != 0)
             {
-                ValueChanged?.Invoke(this, new ValueChangedEventArgs(values));
+                ValueChanged?.Invoke(values);
             }
             if (requestedValues.Count != 0)
             {
