@@ -32,9 +32,9 @@ Choose *No* when asked whether you want to upload to the store. Choose an *Outpu
 
 Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
 
-To add a second app (for example, the background app for the weather station), use `newappxpkg`, but do a few required changes before building. We will do changes to `AppInstall.cmd` and remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these files and packages will be already provided by Appx.Showcase).
+To add a second app (for example, the background app for the weather station), use `newappxpkg <Path to BackgroundWeatherStation> Appx.BackgroundWeatherStation`, but do a few required changes before building.
 
-First, rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
+First, go to directory `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation`. Remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these packages will be already provided by Appx.Showcase). Rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
 
 ```bat
 @echo off
