@@ -10,7 +10,7 @@ namespace ShowcaseBridgeService
     {
         private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
-        private static ValueSet _valueStorage;
+        private static ValueSet _valueStorage = new ValueSet();
 
         private delegate void ValueChangedHandler(ValueSet args);
         private static ValueChangedHandler ValueChanged;
@@ -19,11 +19,6 @@ namespace ShowcaseBridgeService
         {
             taskInstance.Canceled += OnTaskCanceled;
             Debug.WriteLine($"ShowcaseBridgeService FamilyName: {Windows.ApplicationModel.Package.Current.Id.FamilyName}.");
-
-            if (_valueStorage == null)
-            {
-                _valueStorage = new ValueSet();
-            }
 
             if (SetupConnection(taskInstance.TriggerDetails as AppServiceTriggerDetails))
             {

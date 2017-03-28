@@ -63,13 +63,12 @@ namespace BackgroundWeatherStation
 
             await _client.LogDataAsync(temperature, humidity, pressure);
 
-            ValueSet message = new ValueSet
+            await AppServiceBridge.SendMessageAsync(new ValueSet
             {
                 ["temperature"] = temperature,
                 ["humidity"] = humidity,
                 ["pressure"] = pressure
-            };
-            await AppServiceBridge.SendMessageAsync(message);
+            });
 
             Debug.WriteLine("Logged data");
         }

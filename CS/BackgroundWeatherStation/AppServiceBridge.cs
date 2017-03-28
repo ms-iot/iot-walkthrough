@@ -14,7 +14,6 @@ namespace BackgroundWeatherStation
 
         public static async Task InitAsync()
         {
-            Debug.WriteLine("Opening service");
             _service = AppServiceConnectionFactory.GetConnection();
             var serviceStatus = await _service.OpenAsync();
             // Should never fail, since app service is installed with the background app.
@@ -27,6 +26,7 @@ namespace BackgroundWeatherStation
                 Debug.WriteLine($"Service closed: {args.Status}.");
                 await InitAsync();
             };
+            Debug.WriteLine("Connected to app service.");
         }
 
         public static async Task SendMessageAsync(ValueSet message)
