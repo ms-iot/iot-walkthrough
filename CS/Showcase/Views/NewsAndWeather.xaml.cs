@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
@@ -21,6 +22,9 @@ namespace Showcase
         private BingNews _bing = new BingNews();
         private OpenWeatherMap _weather = new OpenWeatherMap();
 
+        // Properties.
+        private bool _isFahrenheit;
+
         public NewsAndWeather()
         {
             this.InitializeComponent();
@@ -36,9 +40,7 @@ namespace Showcase
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
-            AppServiceBridge.RequestUpdate("temperature");
-            AppServiceBridge.RequestUpdate("humidity");
-            AppServiceBridge.RequestUpdate("pressure");
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigTemperatureUnit", "temperature", "humidity", "pressure" });
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -51,6 +53,11 @@ namespace Showcase
         private async void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             ValueSet message = args.Request.Message;
+
+            if (message.TryGetValue("ConfigTemperatureUnit", out object unit))
+            {
+                _isFahrenheit = (string)unit == "Fahrenheit";
+            }
 
             if (message.TryGetValue("temperature", out object temperature) | message.TryGetValue("humidity", out object humidity) | message.TryGetValue("pressure", out object pressure))
             {
@@ -106,10 +113,11 @@ namespace Showcase
 
         private string FormatTemperature(double temperature)
         {
-            if (true)  // TODO Add temperature unit setting
+            if (_isFahrenheit)
             {
-                return temperature.ToString("N1") + " °C";
+                return (temperature * 1.8 + 32).ToString("N1") + " °F";
             }
+            return temperature.ToString("N1") + " °C";
         }
 
         private string FormatHumidity(double humidity)
