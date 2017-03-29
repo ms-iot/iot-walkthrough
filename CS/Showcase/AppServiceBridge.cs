@@ -13,14 +13,6 @@ namespace Showcase
     class AppServiceBridge
     {
         private static ThreadPoolTimer _timer;
-
-        public static AppServiceConnection Service
-        {
-            get
-            {
-                return _service;
-            }
-        }
         private static AppServiceConnection _service;
 
         public static async Task InitAsync()
@@ -43,7 +35,7 @@ namespace Showcase
         private static void Reconnect(string reason)
         {
             _service = null;
-            _timer = ThreadPoolTimer.CreateTimer(async (ThreadPoolTimer timer) => { await InitAsync(); }, TimeSpan.FromSeconds(10));
+            _timer = ThreadPoolTimer.CreateTimer(async (ThreadPoolTimer timer) => { await InitAsync(); }, TimeSpan.FromSeconds(1));
             Debug.WriteLine(reason);
         }
 
@@ -74,10 +66,14 @@ namespace Showcase
                 {
                     await task;
                 }
+                else
+                {
+                    Debug.WriteLine("Skipping message: App service connection is null.");
+                }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Sending message failed: " + e.Message);
+                Debug.WriteLine($"Sending message failed: {e.Message}.");
             }
         }
 

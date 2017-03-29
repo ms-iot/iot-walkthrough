@@ -129,7 +129,7 @@ namespace Showcase
         private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
-            AppServiceBridge.RequestUpdate(new List<string> { "ConfigNewsMarket", "ConfigNewsCategory", "ConfigWeatherContryCode", "ConfigWeatherZipCode" });
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigNewsMarket", "ConfigNewsCategory", "ConfigWeatherContryCode", "ConfigWeatherZipCode", "ConfigTemperatureUnit" });
         }
 
         private void OnUnloaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
@@ -164,11 +164,11 @@ namespace Showcase
                     }
                     await RunOnUi(async () =>
                     {
-                        if (WeatherCountryFromNewsCheckbox.IsChecked.GetValueOrDefault())
+                        if (WeatherCountryFromNewsToggle.IsOn)
                         {
                             await SetWeatherCountryCodeFromNews();
                         }
-                        WeatherCountryFromNewsCheckbox.IsEnabled = true;
+                        WeatherCountryFromNewsToggle.IsEnabled = true;
                         Enable(NewsRegionCombo, regionName);
                         if (!CATEGORIES.ContainsKey((string)region))
                         {
@@ -205,12 +205,12 @@ namespace Showcase
                         if ((string)countryCode == GetNewsCountryCode())
                         {
                             WeatherCountryTextBox.IsEnabled = false;
-                            WeatherCountryFromNewsCheckbox.IsChecked = true;
+                            WeatherCountryFromNewsToggle.IsOn = true;
                         }
                         else
                         {
                             WeatherCountryTextBox.IsEnabled = true;
-                            WeatherCountryFromNewsCheckbox.IsChecked = false;
+                            WeatherCountryFromNewsToggle.IsOn = false;
                         }
                     });
                 }
@@ -218,6 +218,10 @@ namespace Showcase
             if (message.TryGetValue("ConfigWeatherZipCode", out object zip))
             {
                 await RunOnUi(() => { Enable(WeatherZipTextBox, (string)zip); });
+            }
+            if (message.TryGetValue("ConfigTemperatureUnit", out object unit))
+            {
+                await RunOnUi(() => { Enable(WeatherUseFahrenheitToggle, (string)unit == "Fahrenheit"); });
             }
         }
 
@@ -247,7 +251,7 @@ namespace Showcase
                 configs["ConfigNewsCategory"] = "";
                 SetNewsCategoryAvailable(false);
             }
-            WeatherCountryFromNewsCheckbox.IsEnabled = true;
+            WeatherCountryFromNewsToggle.IsEnabled = true;
             await AppServiceBridge.SendMessageAsync(configs);
         }
 
@@ -279,16 +283,25 @@ namespace Showcase
             });
         }
 
-        private async void WeatherCountryFromNewsCheckbox_Checked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void WeatherCountryFromNewsToggle_Toggled(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            WeatherCountryTextBox.IsEnabled = false;
-            await SetWeatherCountryCodeFromNews();
+            WeatherCountryTextBox.IsEnabled = !((ToggleSwitch)sender).IsOn;
+            if (WeatherCountryTextBox.IsEnabled)
+            {
+                WeatherCountryTextBox.Text = "";
+            }
+            else
+            {
+                await SetWeatherCountryCodeFromNews();
+            }
         }
 
-        private void WeatherCountryFromNewsCheckbox_Unchecked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void WeatherUseFahrenheitToggle_Toggled(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            WeatherCountryTextBox.IsEnabled = true;
-            WeatherCountryTextBox.Text = "";
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigTemperatureUnit"] = ((ToggleSwitch)sender).IsOn ? "Fahrenheit" : "Celsius"
+            });
         }
 
         private void Enable(ComboBox box, object selectedItem = null)
@@ -302,7 +315,13 @@ namespace Showcase
         {
             box.IsEnabled = true;
             box.PlaceholderText = "";
-            box.Text = text == null ? "" : text;
+            box.Text = text ?? "";
+        }
+
+        private void Enable(ToggleSwitch box, bool value = false)
+        {
+            box.IsEnabled = true;
+            box.IsOn = value;
         }
 
         private void SetNewsCategoryAvailable(bool available)
