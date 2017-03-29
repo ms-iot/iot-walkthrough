@@ -15,7 +15,7 @@ The background application should be capable of:
 
 Visual Studio 2017 with Universal Windows Platform support will be used. When installing VS2017, make sure *Universal Windows Platform development* is selected.
 
-![Visual Studio installation](Visual Studio.png)
+![Visual Studio installation](VisualStudio.png)
 
 Install the [Windows IoT Core Project Templates](https://marketplace.visualstudio.com/items?itemName=MicrosoftIoT.WindowsIoTCoreProjectTemplates) package, which provides a template for background applications on IoT. [More information on background applications can be found here.](https://developer.microsoft.com/en-us/windows/iot/docs/backgroundapplications)
 
@@ -23,7 +23,7 @@ Install the [Windows IoT Core Project Templates](https://marketplace.visualstudi
 
 We will create a simple application background application to run code at a fixed interval. Open Visual Studio and choose *File > New > Project...*. On the *New Project* window, pick the C# background application template and choose a name for the project.
 
-![Creating a project](Creating a project.png)
+![Creating a project](CreatingAProject.png)
 
 The default template runs `StartupTask` (which is a background task). The `Run` method should be overridden with code to be executed by the app.
 
@@ -59,10 +59,10 @@ namespace BackgroundWeatherStation
 
 To run this code on a device:
 * Choose *Remote Machine* as the target of deployment using the menu bar of Visual Studio.
-![Changing to remote machine](Changing to remote machine.png)
+![Changing to remote machine](ChangingToRemoteMachine.png)
 * Pick you device from the list (or enter it's IP address manually).
 * Run through the menu bar (or press F5).
 
 The message should be printed on the output window every 5 seconds:
 
-![Output window](Output window.png)
+![Output window](OutputWindow.png)

@@ -14,11 +14,11 @@ Datasheets for the sensors are available at:
 
 Right click the project and choose *Add > New Item...*.
 
-![Adding an item](Adding an item.png)
+![Adding an item](AddingAnItem.png)
 
 On the dialog, choose a *Visual C# Class* and name it *WeatherStation*.
 
-![Adding a class](Adding a class.png)
+![Adding a class](AddingAClass.png)
 
 ## Reading pressure data
 

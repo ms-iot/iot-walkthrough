@@ -108,3 +108,5 @@ We'll start with the template manifest for retail images and add the features we
   <Product>Windows 10 IoT Core</Product>
 </OEMInput>
 ```
+
+* Run `buildimage Showcase Retail` to create a retail image.

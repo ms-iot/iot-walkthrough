@@ -17,9 +17,9 @@ Follow the steps outlined at [Provision the solution](https://docs.microsoft.com
 We will use the [Microsoft.Azure.Devices.Client](https://www.nuget.org/packages/Microsoft.Azure.Devices.Client/) library to connect to Azure, which eases the connection to Azure IoT. Before starting, install the library to the background app project using NuGet:
 
 * Open NuGet by right-clicking the BackgroundWeatherStation project.
-![Open NuGet Packages](Open NuGet Packages.png)
+![Open NuGet Packages](OpenNuGetPackages.png)
 * Search for `Microsoft.Azure.Devices.Client` and click install.
-![Install Devices Client](Install Devices Client.png)
+![Install Devices Client](InstallDevicesClient.png)
 
 We will create a class to handle the connection to Azure and data logging. This class will have the device identity and key hardcoded in the application. For production scenarios, the ID and key should be saved in the TPM; [see this page for information on secure storage of keys](../../Security/TPM/README.md).
 
@@ -119,6 +119,6 @@ namespace BackgroundWeatherStation
 
 When run, project will log to the solution dashboard:
 
-![Solution dashboard data](Solution dashboard data.png)
+![Solution dashboard data](SolutionDashboardData.png)
 
 **Note:** Keys hardcoded in the application are not secure. After done testing communication with Azure, you should proceed to [Saving Azure keys to the TPM module and connecting with tokens](../../Security/TPM/README.md)

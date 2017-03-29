@@ -22,23 +22,23 @@ You will need an IoT Hub. Following the [Azure IoT Suite preconfigured solution]
 
 In the IoT Hub, click *Shared access policies* and choose the *iothubowner* policy. Copy the connection string for the primary key.
 
-![IoT Hub](IoT Hub.png)
+![IoT Hub](IoTHub.png)
 
 Open the Device Explorer on your PC. On the *Configuration* tab, paste the connection string in the *IoT Hub Connection String* field, and click update.
 
-![Device explorer](Device explorer.png)
+![Device explorer](DeviceExplorer.png)
 
 Go to the *Management* tab and click *Create*. Use *Security Keys* as the Device Authentication, choose an ID (or check *Auto Generate ID*) and use the auto generated keys. Click *Create*.
 
-![Creating a new device](Device creation.png)
+![Creating a new device](DeviceCreation.png)
 
 Right click the newly created device and click *Copy connection string for selected device*.
 
-![Copying connection string](Copying connection string.png)
+![Copying connection string](CopyingConnectionString.png)
 
 Open the device portal (`http://<your device IP>:8080`) in a browser. Click *TPM Configuration* and paste the connection string to *Azure Connection String*. Click *Save*.
 
-![Saving the key](Saving keys.png)
+![Saving the key](SavingKeys.png)
 
 The device's private key, ID and connection hostname are now saved in the TPM. The ID and hostname can be read in our application, but the private key is locked; the TPM will only provide temporary tokens for our application.
 

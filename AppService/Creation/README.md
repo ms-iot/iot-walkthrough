@@ -6,7 +6,7 @@
 
 An app service allows an application to advertise services for other apps. We will create an app service on the background app. The background and foreground apps will connect to the app service to exchange data (e.g. sensor data and Azure settings).
 
-![App service](App service.png)
+![App service](AppService.png)
 
 The app service could also be placed on the foreground app. Foreground applications also support [in-process app services](https://docs.microsoft.com/en-us/windows/uwp/launch-resume/convert-app-service-in-process), which are simpler to create.
 
@@ -16,7 +16,7 @@ Whenever some app connects to the app service, a background task is started to h
 
 * Create a new project named *ShowcaseAppService* using the *Background Application (IoT)* template.
 
-![Creating background task](Creating background task.png)
+![Creating background task](CreatingBackgroundTask.png)
 
 * Place the following code in `StartupTask.cs`. It's a service that does nothing other than printing to Debug output:
 
@@ -56,7 +56,7 @@ Reload the project (*Right click -> Reload Project*). Find the Package Family Na
 
 1. If you app is associated with the Store, [see this guide to find it on the app registration page](../StoreDeployment/README.md).
 2. Deploy the app and see the PFN on the Build Output window:
-![PFN build output](PFN build output.png)
+![PFN build output](PFNBuildOutput.png)
 3. Write the value of `Windows.ApplicationModel.Package.Current.Id.FamilyName` to debug output and take note of it.
 
 * Create a `AppServiceConnectionFactory` class. It will return connections to the app service. You will connect to a given app service in a PFN:
