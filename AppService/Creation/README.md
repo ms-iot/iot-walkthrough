@@ -54,7 +54,7 @@ namespace ShowcaseAppService
 
 Reload the project (*Right click -> Reload Project*). Find the Package Family Name (PFN) of your background app package. You can find it by one of the following:
 
-1. If you app is associated with the Store, [see this guide to find it on the app registration page](../StoreDeployment/README.md).
+1. If you app is associated with the Store, [see this guide to find it on the app registration page](../../StoreDeployment/README.md).
 2. Deploy the app and see the PFN on the Build Output window:
 ![PFN build output](PFNBuildOutput.png)
 3. Write the value of `Windows.ApplicationModel.Package.Current.Id.FamilyName` to debug output and take note of it.
