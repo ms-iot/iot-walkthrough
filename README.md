@@ -1,2 +1,2 @@
-# devex_project
-Devex Showcase project
+# IOT Walkthrough
+IOT Walkthrough project and documentation
