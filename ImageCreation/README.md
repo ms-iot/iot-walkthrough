@@ -31,116 +31,14 @@ Choose *No* when asked whether you want to upload to the store. Choose an *Outpu
 
 ![Package configuration](PackageConfiguration.png)
 
-Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. Run `buildpkg Appx.Showcase` to build it.
+Inside an *IoTCoreShell*, run `newappxpkg "C:\<Output location>\<Build folder>\<appx file>" fga Appx.Showcase` (e.g. `newappxpkg C:\Users\username\Showcase\AppPackages\Showcase_1.1.1.0_ARM_Test\Showcase_1.1.1.0_ARM.appx Appx.Showcase`). This will create the folder `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase` with files to build your package. The `fga` parameter sets it as the default foreground app (the one shown whenever you boot the board). Run `buildpkg Appx.Showcase` to build it.
 
-To add a second app (for example, the background app for the weather station), use `newappxpkg <Path to BackgroundWeatherStation appx> Appx.BackgroundWeatherStation`, but do a few required changes before building.
-
-First, go to the package's folder, `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.BackgroundWeatherStation`. In the `AppInstall` folder, remove `Microsoft.NET.CoreRuntime.1.1.appx` and `Microsoft.VCLibs.ARM.Debug.14.00.appx` (the build tool will fail if file conflicts are detected, and these packages will be already provided by Appx.Showcase). Rename `AppxConfig.cmd` to `AppxConfigBackground.cmd`. Rename `AppInstall.cmd` to `AppInstallBackground.cmd` and replace its contents with this slightly modified script, which skips installation of dependencies and calls `iotstartup.exe add headless` instead of headed:
-
-```bat
-@echo off
-
-::
-:: Ensure we execute batch script from the folder that contains the batch script
-::
-pushd %~dp0
-SETLOCAL
-
-if not exist %systemdrive%\windows\system32\deployappx.exe (
-    echo Error: deployappx.exe not found. exiting.
-    exit /b 1
-)
-
-call AppxConfigBackground.cmd
-
-echo Appx Name :%AppxName%
-
-REM Set defaults for optional parameters
-if not defined forceinstall ( set forceinstall=0 )
-if not defined launchapp ( set launchapp=1 )
-if not exist .\logs ( mkdir logs ) else ( del /Q .\logs\*.* )
-
-REM
-REM Install the Main Appx
-REM
-if %forceinstall% == 1 (
-    set INSTALL_PARAMS=install force %AppxName%.appx
-) else (
-    set INSTALL_PARAMS=install %AppxName%.appx
-)
-echo Installing %AppxName%.appx with %INSTALL_PARAMS%
-deployappx.exe %INSTALL_PARAMS% > %temp%\%AppxName%_result.txt
-if "%ERRORLEVEL%"=="0" (
-    if %launchapp% == 1 (
-        call :LAUNCH_APP
-    )
-) else (
-    echo. Error in installing %AppxName%.appx.
-    echo. Result:%ERRORLEVEL%
-)
-
-goto :CLEANUP
-
-:LAUNCH_APP
-deployappx.exe getpackageid %AppxName%.appx > .\logs\packageid.txt
-for /f "tokens=2,5 delims=:_" %%A in (.\logs\packageid.txt) do (
-    set AppxID=%%A_%%B
-)
-set AppxID=%AppxID: =%
-echo Launching %AppxID%
-REM Trigger IoTStartup
-iotstartup.exe add headless %AppxID%
-
-exit /b
-
-:SUB_CHECKERROR
-if "%ERRORLEVEL%"=="0" exit/b
-echo.
-echo Error %1
-echo Result=%ERRORLEVEL%
-echo.
-exit /b %ERRORLEVEL%
-
-:CLEANUP
-popd
-ENDLOCAL
-exit /b
-```
-
-Change the package's manifest (`Appx.BackgroundWeatherStation.pkg.xml` in the package's folder) to install only the app, the certificate, `AppxConfigBackground.cmd` and `AppInstallBackground.cmd`:
-
-```xml
-<?xml version="1.0" encoding="utf-8" ?>
-<Package xmlns="urn:Microsoft.WindowsPhone/PackageSchema.v8.00"
-         Owner="$(OEMNAME)" OwnerType="OEM" ReleaseType="Production"
-         Platform="arm" Component="Appx" SubComponent="BackgroundWeatherStation">
-   <Components>
-      <OSComponent>
-         <Files>
-            <File Source="AppInstall\AppInstallBackground.cmd"
-                  DestinationDir="$(runtime.root)\AppInstall"
-                  Name="AppInstallBackground.cmd" />
-            <File Source="AppInstall\AppxConfigBackground.cmd"
-                  DestinationDir="$(runtime.root)\AppInstall"
-                  Name="AppxConfigBackground.cmd" />
-            <File Source="AppInstall\BackgroundWeatherStation_1.0.3.0_ARM_Debug.appx"
-                  DestinationDir="$(runtime.root)\AppInstall"
-                  Name="BackgroundWeatherStation_1.0.3.0_ARM_Debug.appx" />
-            <File Source="AppInstall\BackgroundWeatherStation_1.0.3.0_ARM_Debug.cer"
-                  DestinationDir="$(runtime.root)\AppInstall"
-                  Name="BackgroundWeatherStation_1.0.3.0_ARM_Debug.cer" />
-         </Files>
-      </OSComponent>
-   </Components>
-</Package>
-
-```
-
-Then run `buildpkg Appx.BackgroundWeatherStation`.
+To add a second app (for example, the background app for the weather station), use `newappxpkg <Path to BackgroundWeatherStation appx> bgt Appx.BackgroundWeatherStation`. The `bgt` parameter sets it as a startup background task. Build with `buildpkg Appx.BackgroundWeatherStation`.
 
 Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your package file to the OEM features:
 
 ```xml
+...
 <PackageFile Path="%PKGBLD_DIR%" Name="%OEM_NAME%.Appx.Showcase.cab">
   <FeatureIDs>
     <FeatureID>OEM_AppxShowcase</FeatureID>
@@ -151,9 +49,10 @@ Open file `C:\IoT-ADK-AddonKit\Source-arm\Packages\OEMFM.xml` and add your packa
     <FeatureID>OEM_AppxBackgroundWeatherStation</FeatureID>
   </FeatureIDs>
 </PackageFile>
+...
 ```
 
-Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, add the `IOT_SPEECHDATA_EN_US` package to the list of features.
+Next, open `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\TestOEMInput.xml` and add `<AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>` and `<AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>` to the `AdditionalFMs` block. Add the required OEM packages to the OEM features (`OEM_AppxMain`, `OEM_CustomCmd`, `OEM_ProvAuto` and `OEM_AppxHelloWorld`) and comment the sample packages. Furthermore, if speech synthesis is desired, [add the desired speech language to the list of features](https://msdn.microsoft.com/en-us/windows/hardware/commercialize/manufacture/iot/iot-core-feature-list#Speech_data).
 
 **Note:** Your app might crash if features are missing. [Check the complete list of features if you need to find a missing feature.](https://msdn.microsoft.com/en-us/windows/hardware/commercialize/manufacture/iot/iot-core-feature-list) There is a limit to the number of times a startup app is allowed to crash before a board reboot is issued; if your app works on a production image but not on an OEM image (eg. app stuck at the loading screen and the board reboots after some time), you are probably missing some feature.
 
@@ -189,11 +88,11 @@ The final manifest should look like:
   </Resolutions>
   <AdditionalFMs>
     <!-- Including BSP feature manifest -->
-    <AdditionalFM>%BSPSRC_DIR%\QCDB410C\Packages\QCDB410CFM.xml</AdditionalFM>
-    <AdditionalFM>%AKROOT%\FMFiles\arm\QCDB410CTestFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\QCDB410CFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\QCDB410CTestFM.xml</AdditionalFM>
     <!-- Including OEM feature manifest -->
-    <AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>
-    <AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\OEMCommonFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\OEMFM.xml</AdditionalFM>
     <!-- Including the test features -->
     <AdditionalFM>%AKROOT%\FMFiles\arm\IoTUAPNonProductionPartnerShareFM.xml</AdditionalFM>
   </AdditionalFMs>
@@ -203,7 +102,10 @@ The final manifest should look like:
       <Feature>IOT_KDUSB_SETTINGS</Feature>
       <Feature>IOT_EFIESP_BCD</Feature>
       <Feature>IOT_DISABLEBASICDISPLAYFALLBACK</Feature>
+      <Feature>IOT_HWN_CLASS_EXTENSION</Feature>
+      <Feature>IOT_USBFN_CLASS_EXTENSION</Feature>
       <Feature>PRODUCTION_CORE</Feature>
+      <Feature>IOT_APPLICATIONS</Feature>
       <Feature>PRODUCTION</Feature>
       <Feature>IOT_UAP_OOBE</Feature>
       <Feature>IOT_TOOLKIT</Feature>
@@ -223,8 +125,8 @@ The final manifest should look like:
       <Feature>IOT_APP_TOOLKIT</Feature>
       <Feature>IOT_CP210x_MAKERDRIVER</Feature>
       <Feature>IOT_FTSER2K_MAKERDRIVER</Feature>
-      <Feature>IOT_SPEECHDATA_EN_US</Feature>
       <!-- <Feature>IOT_ENABLE_ADMIN</Feature> -->
+      <Feature>IOT_POWER_SETTINGS</Feature>
     </Microsoft>
     <OEM>
       <Feature>QC_UEFI_TEST</Feature>
@@ -241,36 +143,7 @@ The final manifest should look like:
 </OEMInput>
 ```
 
-To make your app install automatically and become the default startup app, edit `C:\IoT-ADK-AddonKit\Source-arm\Products\Showcase\oemcustomization.cmd` and uncomment the lines that execute `C:\AppInstall\AppInstall.cmd` and add commands to run `C:\AppInstall\AppInstallBackground.cmd`. The final script is:
-
-```bat
-@echo off
-REM OEM Customization Script file
-REM This script if included in the image, is called everytime the system boots.
-
-REM Enable Administrator User
-net user Administrator p@ssw0rd /active:yes
-
-if exist C:\OEMTools\InstallAppx.cmd (
-    REM Run the Appx Installer. This will install the appx present in C:\OEMApps\
-    call C:\OEMTools\InstallAppx.cmd
-)
-
-if exist C:\AppInstall\AppInstallBackground.cmd (
-    REM Install background app
-    call C:\AppInstall\AppInstallBackground.cmd > %temp%\BackgroundAppInstallLog.txt
-)
-
-if exist C:\AppInstall\AppInstall.cmd (
-    REM Install app
-    call C:\AppInstall\AppInstall.cmd > %temp%\AppInstallLog.txt
-)
-
-cd \
-rmdir /S /Q C:\OEMInstall
-```
-
-Build the image with `buildimage Showcase Test` and your app will show up after boot!
+Build the image with `buildimage Showcase Test` and your apps will show up after boot!
 
 ## Updating apps
 
