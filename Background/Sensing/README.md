@@ -187,7 +187,7 @@ public double ReadHumidity()
 }
 ```
 
-[The final *WeatherStation* class is available here.](https://github.com/ms-iot/devex_project/blob/master/CS/BackgroundWeatherStation/WeatherStation.cs)
+[The final *WeatherStation* class is available here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/BackgroundWeatherStation/WeatherStation.cs)
 
 ## Testing on a device
 

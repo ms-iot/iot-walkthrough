@@ -16,7 +16,7 @@ Right click your solution and choose *Add > New Project...*. Choose *Visual C# >
 
 ![Navigation pane](NavigationPane.png)
 
-* The layout is made of a `SplitView` containing `StackPanel`s for the buttons in its `Pane` and a `Frame` in its `Content`, named `ContentFrame`, that will keep the current page. [The XAML can be seen here.](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/Views/MainPage.xaml)
+* The layout is made of a `SplitView` containing `StackPanel`s for the buttons in its `Pane` and a `Frame` in its `Content`, named `ContentFrame`, that will keep the current page. [The XAML can be seen here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/Views/MainPage.xaml)
 
 * Whenever a button is clicked, we should move to the corresponding page. Furthermore, since it's a flat navigation tree, we don't want to keep the `BackStack` history (the history of pages to return to whenever the back button is pressed). The following function hides the `Pane` and navigates to the new page, clearing the `BackStack`:
 
@@ -50,4 +50,4 @@ private void PanelToggle_Click(object sender, RoutedEventArgs e)
 }
 ```
 
-* [The full code for the MainPage can be seen here.](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/Views/MainPage.xaml.cs)
+* [The full code for the MainPage can be seen here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/Views/MainPage.xaml.cs)
