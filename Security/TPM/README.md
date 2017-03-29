@@ -69,4 +69,4 @@ private void RefreshToken()
 }
 ```
 
-Whenever we get an `UnauthorizedException` during a `SendEventAsync` call, we should refresh the token and retry. <a href="https://github.com/ms-iot/devex_project/blob/master/CS/BackgroundWeatherStation/IoTHubClient.cs" target="_blank">The updated class is available here.</a>
+Whenever we get an `UnauthorizedException` during a `SendEventAsync` call, we should refresh the token and retry. <a href="https://github.com/ms-iot/iot-walkthrough/blob/master/CS/BackgroundWeatherStation/IoTHubClient.cs" target="_blank">The updated class is available here.</a>

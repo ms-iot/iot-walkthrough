@@ -137,4 +137,4 @@ private async void BroadcastReceivedMessage(ValueSet changedValues)
 * Add `ValueChanged += BroadcastReceivedMessage;` to the `SetupConnection` method and `ValueChanged -= BroadcastReceivedMessage;` to `OnTaskCanceled`;
 * Call `ValueChanged?.Invoke(values);` whenever you need to broadcast an update to all app service instances.
 
-[The full code for the app service `StartupTask`, including broadcast of updates, is available here.](https://github.com/ms-iot/devex_project/blob/master/CS/ShowcaseAppService/StartupTask.cs)
+[The full code for the app service `StartupTask`, including broadcast of updates, is available here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/ShowcaseAppService/StartupTask.cs)

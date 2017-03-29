@@ -27,7 +27,7 @@ The final interface will show weather data on the corner of the screen:
 | `main.pressure`       | Pressure in hPa                          |
 | `main.humidity`       | Humidity in %                            |
 
-Since we will be parsing HTTP JSON responses in our code often, a helper function to do the request and check for errors is handy. [A simple helper is available here and should be trivial to understand](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/HttpHelper.cs). The `TryGetJsonAsync` function returns a `Task<JsonObject>` if successful, null otherwise.
+Since we will be parsing HTTP JSON responses in our code often, a helper function to do the request and check for errors is handy. [A simple helper is available here and should be trivial to understand](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/HttpHelper.cs). The `TryGetJsonAsync` function returns a `Task<JsonObject>` if successful, null otherwise.
 
 Create a `OpenWeatherMap.cs` class. The function to build the request must include parameters specifying the location and app ID:
 
@@ -99,7 +99,7 @@ private async void FetchWeather()
 }
 ```
 
-[The full class can be found here.](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/OpenWeatherMap.cs). The UI to show the weather is implemented in XAML. [The full code can be found here](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/Views/NewsAndWeather.xaml), and the excerpt with the weather UI is:
+[The full class can be found here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/OpenWeatherMap.cs). The UI to show the weather is implemented in XAML. [The full code can be found here](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/Views/NewsAndWeather.xaml), and the excerpt with the weather UI is:
 
 ```xml
 <StackPanel RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignRightWithPanel="True">
@@ -116,7 +116,7 @@ private async void FetchWeather()
 </StackPanel>
 ```
 
-[The full code for the weather and news page is here](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/Views/NewsAndWeather.xaml.cs); the code to update the UI copies the data from the model to the view:
+[The full code for the weather and news page is here](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/Views/NewsAndWeather.xaml.cs); the code to update the UI copies the data from the model to the view:
 
 ```xml
 private async void WeatherUpdate(object sender, EventArgs args)

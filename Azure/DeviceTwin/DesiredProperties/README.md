@@ -98,4 +98,4 @@ class BingNews
 }
 ```
 
-[The full `BingNews.cs` class is available here.](https://github.com/ms-iot/devex_project/blob/master/CS/Showcase/BingNews.cs)
+[The full `BingNews.cs` class is available here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/BingNews.cs)

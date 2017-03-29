@@ -81,7 +81,7 @@ namespace BackgroundWeatherStation
 }
 ```
 
-* Create an `AppServiceBridge.cs` class. It handles the reconnection cycle in case the connection is closed. [The code for the class is available here.](https://github.com/ms-iot/devex_project/blob/master/CS/BackgroundWeatherStation/AppServiceBridge.cs) It mostly forwards calls to the underlying `AppServiceConnection`.
+* Create an `AppServiceBridge.cs` class. It handles the reconnection cycle in case the connection is closed. [The code for the class is available here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/BackgroundWeatherStation/AppServiceBridge.cs) It mostly forwards calls to the underlying `AppServiceConnection`.
 
 > Being fault tolerant in the connection is desirable. Our app should be able to reconnect and keep working if the app service crashes or closes the connection.
 
