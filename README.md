@@ -1,8 +1,10 @@
-# Developer Experience showcase project
+# IoT Walkthrough Project
 
 ## Introduction
 
-This project's goal is to show intended usage guidelines of Windows on IoT. To fulfill this goal, our solution will have two applications:
+This project's goal is to show intended usage guidelines of Windows on IoT and walk through the creation of an IoT device, from implementation to final deployment.
+
+The project will have two applications:
 
 * One background application to receive sensor data and send it to the Azure cloud. Receiving sensor data and analyzing it are important tasks in IoT and a device will often operate in "headless" mode for monitoring; thus, we separate these tasks in an independent app. It also receives application keys securely and saves user settings to Azure.
 * One foreground application for user interaction. This application shows local weather (read by the background app), information from the internet (news and regional weather) and interacts with the user (playing media or showing a slideshow). A settings page is also available to change settings.
@@ -48,4 +50,3 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [IoT image creation](ImageCreation/README.md)
 8. Deployment
     * [Creating a retail OEM image](ImageCreation/Retail/README.md)
-    * Zero touch provisioning
