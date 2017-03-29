@@ -15,7 +15,7 @@ The applications are written using Universal Windows Platform (UWP); thus, the s
 
 ## Guides
 
-Steps from implementation of apps to deployment are documented with an end-to-end solution.
+Steps from implementation of apps to deployment are documented with an end-to-end solution. Each tutorial shows small code snippets and then links to the code running in the walkthrough project.
 
 ![Sections](Sections.png)
 
@@ -34,7 +34,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
 4. Inter-application communication
     * [Creating an app service](AppService/Creation/README.md)
     * [Communication between applications](AppService/Communication/README.md)
-    * Showing local weather data
+    * [Showing local weather data](AppService/ShowingWeatherData/README.md)
 5. Connecting to the Azure cloud
     * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution/README.md)
     * [Saving application keys on Azure](Azure/DeviceTwin/DesiredProperties/README.md)
