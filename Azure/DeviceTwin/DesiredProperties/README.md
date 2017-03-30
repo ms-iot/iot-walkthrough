@@ -29,10 +29,6 @@ The `OnDesiredPropertyChanged` function must send the property changes through t
 ```cs
 private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, object userContext)
 {
-    ValueSet properties = new ValueSet
-    {
-        ["version"] = desiredProperties.Version
-    };
     foreach (var prop in desiredProperties)
     {
         var pair = (KeyValuePair<string, object>)prop;
@@ -48,54 +44,106 @@ private async Task OnDesiredPropertyChanged(TwinCollection desiredProperties, ob
 }
 ```
 
-**Note:** There is a race condition in the above code if the `version` field is not sent through the app service. If some property is updated after the `GetTwinAsync` call and before the `twin.Properties.Desired` properties are advertised, the applications connected to the app service would first receive the updated value and then the old value, in the wrong order. Connected applications should check the `version` field before using the value.
-
 Applications connected to the app service should listen for app service requests and act upon it. For example, to use keys saved on the Device Twin to fetch news from Bing, the following code can be added to `BingNews.cs`:
 
 ```cs
 class BingNews
 {
     private string _key;
-    private long _keyVersion = -1;
-    private object _keyVersionLock = new object();
 
     public BingNews()
     {
         // Install event handler on constructor.
         AppServiceBridge.RequestReceived += PropertyUpdate;
-        // Request the current value of bingKey. If available, the response will have no version information, since we requested only the bingKey key.
+        // Request the current value of bingKey.
         AppServiceBridge.RequestUpdate("bingKey");
     }
 
     private void PropertyUpdate(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
     {
-        // Check if bingKey is contained in the message.
-        args.Request.Message.TryGetValue("bingKey", out object key);
-        if (key != null)
-        {
-            lock (_keyVersionLock)
-            {
-                if (args.Request.Message.TryGetValue("version", out object version))
-                {
-                    var receivedVersion = (long)version;
-                    if (receivedVersion >= _keyVersion)
-                    {
-                        _keyVersion = receivedVersion;
-                    }
-                }
-                else if (_keyVersion != -1)
-                {
-                    // Do nothing if we have already received a key with version information
-                    // and the newer one has no version.
-                    return;
-                }
-                _key = (string)key;
-            }
-            // Run a timer to update news.
-            InitTimer();
-        }
+      var message = args.Request.Message;
+      if (TryGetValue(message, "bingKey", ref _key))
+      {
+          // Run a timer to periodically update news.
+          InitTimer();
+      }
     }
 }
 ```
 
 [The full `BingNews.cs` class is available here.](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/BingNews.cs)
+
+## Changing properties
+
+The *Microsoft.Azure.Devices* library can be used to schedule desired properties updates for a single device, a group of devices or all deployed devices. It can be used in an UWP or Console application to programmatically set the application keys that will be available in the cloud. [The Azure documentation and samples to set the device twin in C# is available here.](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-csharp-node-schedule-jobs#schedule-jobs-for-calling-a-direct-method-and-updating-a-device-twins-properties)
+
+We will create a console app to set the `bingKey` property in a set of devices. This app can be run on an administrator computer to configure multiple devices.
+
+* Get the connection string that gives full access to your IoT Hub. It will be used to access IoT Hub from your application. [Open the Azure portal](https://ms.portal.azure.com/), click the IoT Hub resource and choose *Shared access policies > iothubowner > Copy Connection string - primary key*.
+
+![Dashboard](Dashboard.png)
+
+![Iot Hub](IotHub.png)
+
+* Create a new console app by opening *File > New > Project > Templates > Visual C# > Console Application*.
+* Right click the project, choose *Manage NuGet Packages...* and install the *Microsoft.Azure.Devices* package.
+* Open `Program.cs` and paste the following code to update the `bingKey` property in all devices:
+
+```cs
+using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices.Shared;
+using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace UpdateTwinCS
+{
+    class Program
+    {
+        static string connString = "<connection string here>";
+        static JobClient jobClient;
+
+        static void Main(string[] args)
+        {
+            jobClient = JobClient.CreateFromConnectionString(connString);
+            var id = Guid.NewGuid().ToString();
+            Debug.WriteLine($"Creating job {id}.");
+            StartMethodJob(id).Wait();
+            MonitorJob(id).Wait();
+            Console.ReadLine();
+        }
+
+        public static async Task StartMethodJob(string jobId)
+        {
+            Twin twin = new Twin();
+            twin.Properties.Desired["bingKey"] = "<your key here>";
+            twin.ETag = "*";
+            var response = await jobClient.ScheduleTwinUpdateAsync(jobId, "", twin, DateTime.Now, 20);
+            if (response.Status == JobStatus.Failed || response.Status == JobStatus.Cancelled)
+            {
+                Console.WriteLine($"Failed to schedule job: {response.Status} - {response.StatusMessage}.");
+            }
+        }
+
+        public static async Task MonitorJob(string jobId)
+        {
+            JobResponse response;
+            do
+            {
+                response = await jobClient.GetJobAsync(jobId);
+                Thread.Sleep(1000);
+                Console.WriteLine($"Job Status : {response.Status.ToString()}.");
+            } while (response.Status != JobStatus.Completed && response.Status != JobStatus.Failed && response.Status != JobStatus.Cancelled);
+            if (response.Status != JobStatus.Completed)
+            {
+                Debug.WriteLine($"Job didn't complete: {response.FailureReason}.");
+                Console.WriteLine($"Job didn't complete: {response.FailureReason}.");
+            }
+        }
+    }
+}
+
+```
+
+* If only a subset of the devices is desired, the second parameter of the `ScheduleTwinUpdateAsync` call receives an IoT Hub query (e.g. `deviceId IN ['devex-showcase']`). [The full documentation for queries is available here.](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-query-language)

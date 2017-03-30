@@ -12,35 +12,13 @@ Using a TPM to connect to Azure makes your application safer, since keys won't b
 
 You will need an IoT Hub. Following the [Azure IoT Suite preconfigured solution](https://docs.microsoft.com/en-us/azure/iot-suite/iot-suite-getstarted-preconfigured-solutions) will create one automatically.
 
-[The Device Explorer application](https://github.com/Azure/azure-iot-sdks/releases) will be used to generate the TPM keys.
+## Configuring the TPM
 
-## Connecting the Device Explorer to the IoT Hub
-
-[Open the Azure portal](https://ms.portal.azure.com/) and click the IoT Hub resource, highlighted in yellow in the image below:
-
-![Dashboard](Dashboard.png)
-
-In the IoT Hub, click *Shared access policies* and choose the *iothubowner* policy. Copy the connection string for the primary key.
-
-![IoT Hub](IoTHub.png)
-
-Open the Device Explorer on your PC. On the *Configuration* tab, paste the connection string in the *IoT Hub Connection String* field, and click update.
-
-![Device explorer](DeviceExplorer.png)
-
-Go to the *Management* tab and click *Create*. Use *Security Keys* as the Device Authentication, choose an ID (or check *Auto Generate ID*) and use the auto generated keys. Click *Create*.
-
-![Creating a new device](DeviceCreation.png)
-
-Right click the newly created device and click *Copy connection string for selected device*.
-
-![Copying connection string](CopyingConnectionString.png)
-
-Open the device portal (`http://<your device IP>:8080`) in a browser. Click *TPM Configuration* and paste the connection string to *Azure Connection String*. Click *Save*.
+Open the device portal (`http://<your device IP>:8080`) in a browser. Click *TPM Configuration* and paste the hostname, device ID and primary key in the respective fields. Click *Save*.
 
 ![Saving the key](SavingKeys.png)
 
-The device's private key, ID and connection hostname are now saved in the TPM. The ID and hostname can be read in our application, but the private key is locked; the TPM will only provide temporary tokens for our application.
+The data is now saved in the TPM. The ID and hostname can be read in our application, but the private key is locked; the TPM will only provide temporary tokens for our application based on the primary key.
 
 Our previous `IoTHubClient.cs` code will be changed slightly to use the TPM keys. The class will have a few more instance variables to store an instance of the TPM and the device ID:
 
@@ -69,4 +47,4 @@ private void RefreshToken()
 }
 ```
 
-Whenever we get an `UnauthorizedException` during a `SendEventAsync` call, we should refresh the token and retry. <a href="https://github.com/ms-iot/iot-walkthrough/blob/master/CS/BackgroundWeatherStation/IoTHubClient.cs" target="_blank">The updated class is available here.</a>
+Whenever we get an `UnauthorizedException` during a `SendEventAsync` call, we should refresh the token and retry. Depending on your project and the importance of the Azure operation being done, more measures should be taken to make the cloud communication more reliable. The *BackgroundWeatherStation* in the showcase project uses a `SemaphoreSlim` around Azure operations to avoid refreshing the connection while a transfer is in place and keeps a queue of failed operations and retries them using `SendEventBatchAsync`, so that short disconnections don't discard data. <a href="https://github.com/ms-iot/iot-walkthrough/blob/master/CS/BackgroundWeatherStation/IoTHubClient.cs" target="_blank">The class used in the project is available here.</a>
