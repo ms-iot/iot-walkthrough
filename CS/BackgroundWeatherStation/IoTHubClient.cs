@@ -129,7 +129,7 @@ namespace BackgroundWeatherStation
 
             try
             {
-                await DoDeviceOperation(async (DeviceClient client) => { await _deviceClient.SendEventBatchAsync(messages); });
+                await DoDeviceOperation(async (DeviceClient client) => { await client.SendEventBatchAsync(messages); });
             }
             catch (Exception e)
             {
@@ -172,6 +172,10 @@ namespace BackgroundWeatherStation
                     operation(_deviceClient);
                     _errorCount = 0;
                 }
+                else
+                {
+                    throw new Exception($"Azure operation failed: {e.Message}.", e);
+                }
             }
         }
 
@@ -195,9 +199,10 @@ namespace BackgroundWeatherStation
 
             try
             {
-                if (_deviceClient != null)
+                var task = _deviceClient?.CloseAsync();
+                if (task != null)
                 {
-                    await _deviceClient.CloseAsync();
+                    await task;
                 }
                 _deviceClient = DeviceClient.Create(_tpm.GetHostName(), method, TransportType.Mqtt_WebSocket_Only);
                 await _deviceClient.OpenAsync();
