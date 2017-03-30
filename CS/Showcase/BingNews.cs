@@ -96,15 +96,7 @@ namespace Showcase
 
         private NewsModel NewsFromJsonObject(JsonObject json)
         {
-            NewsModel.ThumbnailModel thumbnail = null;
-            if (json.ContainsKey("image"))
-            {
-                thumbnail = new NewsModel.ThumbnailModel();
-                var jsonThumbnail = json.GetNamedObject("image").GetNamedObject("thumbnail");
-                thumbnail.Source = jsonThumbnail.GetNamedString("contentUrl");
-                thumbnail.Width = (int)jsonThumbnail.GetNamedNumber("width");
-                thumbnail.Height = (int)jsonThumbnail.GetNamedNumber("height");
-            }
+            string thumbnail = json.GetNamedObject("image", null)?.GetNamedObject("thumbnail").GetNamedString("contentUrl");
             return new NewsModel(json.GetNamedString("name"), json.GetNamedString("url"), thumbnail);
         }
 
