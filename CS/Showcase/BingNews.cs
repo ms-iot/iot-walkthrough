@@ -122,7 +122,7 @@ namespace Showcase
             var uri = $"{ENDPOINT}?mkt={_market}";
             if (!String.IsNullOrEmpty(_category))
             {
-                uri += $"&category={ _category.Replace(" ", "").Replace("-", "_")}";
+                uri += $"&category={_category.Replace(" ", "").Replace("-", "_")}";
             }
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, uri);
             req.Headers.Add("Ocp-Apim-Subscription-Key", _key);
