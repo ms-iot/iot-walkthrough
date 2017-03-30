@@ -41,7 +41,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * Synchronizing settings with Azure
 6. Integration with third-party services
     * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
-    * Integration with Bing news
+    * [Integration with Bing news](Integrations/BingNews/README.md)
     * [Associating the app with the Windows Store](StoreDeployment/README.md)
     * Showing OneDrive pictures
 7. Preparing for deployment
