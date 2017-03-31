@@ -143,7 +143,7 @@ The final manifest should look like:
 </OEMInput>
 ```
 
-Build the image with `buildimage Showcase Test` and your apps will show up after boot!
+Run `buildpkg all` to run the feature merger. Build the image with `buildimage Showcase Test` and your apps will show up after boot!
 
 ## Updating apps
 
