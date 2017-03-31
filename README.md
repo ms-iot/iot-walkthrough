@@ -29,7 +29,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Creating a foreground application](Foreground/Creating/README.md)
     * [Usage of text-to-speech](Speech/TextToSpeech/README.md)
     * [Receiving voice commands](Speech/VoiceCommands/README.md)
-    * Playing media
+    * [Playing media](Foreground/MediaPlayer/README.md)
 4. Inter-application communication
     * [Creating an app service](AppService/Creation/README.md)
     * [Communication between applications](AppService/Communication/README.md)
