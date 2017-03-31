@@ -55,7 +55,7 @@ class BingNews
 }
 ```
 
-Then, (`HttpHelper.TryGetJsonAsync`)[https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/HttpHelper.cs] can be used to parse the JSON response. An `EventHandler` will be called whenever the news are updated:
+Then, [`HttpHelper.TryGetJsonAsync`](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/HttpHelper.cs) can be used to parse the JSON response. An `EventHandler` will be called whenever the news are updated:
 
 ```cs
 public class NewsUpdateEventArgs : EventArgs
