@@ -8,7 +8,8 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
 namespace Showcase
-{   public sealed partial class Settings : Page
+{
+    public sealed partial class Settings : Page
     {
         public ObservableCollection<String> NewsRegions { get { return _newsRegion; } }
         public ObservableCollection<String> NewsCategories { get { return _newsCategories; } }

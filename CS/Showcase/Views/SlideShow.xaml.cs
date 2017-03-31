@@ -21,7 +21,6 @@ namespace Showcase
         private readonly Color WHITE = Color.FromArgb(255, 255, 255, 255);
 
         private int currentImage = 0;
-        private int imageTime = 10000;
         private ThreadPoolTimer startFadeTimer;
         private DispatcherTimer _hideControlsTimer;
         private CoreDispatcher _uiDispatcher;
@@ -55,7 +54,7 @@ namespace Showcase
         private async void OnLoaded(object sender, RoutedEventArgs args)
         {
             AppServiceBridge.RequestReceived += PropertyUpdate;
-            AppServiceBridge.RequestUpdate(new List<string> { "ConfigSlideShowBackgroundColor", "ConfigSlideShowStrech" });
+            AppServiceBridge.RequestUpdate(new List<string> { "ConfigSlideShowBackgroundColor", "ConfigSlideShowStrech", "ConfigSlideShowDuration" });
             try
             {
                 await _oneDrive.InitAsync();
@@ -111,6 +110,10 @@ namespace Showcase
             {
                 await RunOnUi(() => { SetStretch((string)stretch); });
             }
+            if (message.TryGetValue("ConfigSlideShowDuration", out object duration) && duration != null)
+            {
+                await RunOnUi(() => { SetTransitionDelay(double.Parse((string)duration)); });
+            }
         }
 
         private void OnPointerMoved(object sender, RoutedEventArgs e)
@@ -140,7 +143,8 @@ namespace Showcase
 
         private void Play()
         {
-            startFadeTimer = ThreadPoolTimer.CreatePeriodicTimer(StartFadeAnimation, TimeSpan.FromMilliseconds(imageTime));
+            var timespan = TimeSpan.FromMilliseconds(5 * FadeAnimation.Duration.TimeSpan.TotalMilliseconds);
+            startFadeTimer = ThreadPoolTimer.CreatePeriodicTimer(StartFadeAnimation, timespan);
         }
 
         private void Pause()
@@ -156,6 +160,12 @@ namespace Showcase
                 Pause();
                 Play();
             }
+        }
+
+        private void SetTransitionDelay(double milliseconds)
+        {
+            ForegroundFadeAnimation.Duration = FadeAnimation.Duration = TimeSpan.FromMilliseconds(milliseconds);
+            ResetTimer();
         }
 
         private void Toggle_Click(object sender, RoutedEventArgs e)
@@ -190,29 +200,31 @@ namespace Showcase
             SetTimePopup.IsOpen = true;
         }
 
-        private void SetTimePopup_ItemClick(object sender, ItemClickEventArgs e)
+        private async void SetTimePopup_ItemClick(object sender, ItemClickEventArgs e)
         {
             TextBlock item = e.ClickedItem as TextBlock;
+            var currentDelay = FadeAnimation.Duration.TimeSpan.TotalMilliseconds;
 
             switch (item.Text)
             {
-                case "Faster transition":
-                    Debug.WriteLine("Prev fade time " + FadeAnimation.Duration.TimeSpan.Milliseconds);
-                    ForegroundFadeAnimation.Duration = FadeAnimation.Duration = TimeSpan.FromMilliseconds(FadeAnimation.Duration.TimeSpan.TotalMilliseconds / 2);
-                    Debug.WriteLine("Fade time " + FadeAnimation.Duration.TimeSpan.Milliseconds);
+                case "Slower transition":
+                    currentDelay *= 2;
                     break;
 
-                case "Faster image switch":
-                    imageTime /= 2;
-                    Debug.WriteLine("Switch time " + imageTime);
-                    Pause();
-                    Play();
+                case "Faster transition":
+                    currentDelay /= 2;
                     break;
 
                 default:
                     Debug.WriteLine("Unknown popup option " + item.Text + "selected");
-                    break;
+                    return;
             }
+
+            SetTransitionDelay(currentDelay);
+            await AppServiceBridge.SendMessageAsync(new ValueSet
+            {
+                ["ConfigSlideShowDuration"] = currentDelay.ToString("N3")
+            });
         }
 
         private void SetStretchType_Click(object sender, RoutedEventArgs e)
