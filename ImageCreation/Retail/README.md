@@ -71,30 +71,30 @@ We'll start with the template manifest for retail images and add the features we
   </Resolutions>
   <AdditionalFMs>
     <!-- Including BSP feature manifest -->
-    <AdditionalFM>%BSPSRC_DIR%\QCDB410C\Packages\QCDB410CFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\QCDB410CFM.xml</AdditionalFM>
     <!-- Including OEM feature manifest -->
-    <AdditionalFM>%COMMON_DIR%\Packages\OEMCommonFM.xml</AdditionalFM>
-    <AdditionalFM>%SRC_DIR%\Packages\OEMFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\OEMCommonFM.xml</AdditionalFM>
+    <AdditionalFM>%BLD_DIR%\MergedFMs\OEMFM.xml</AdditionalFM>
   </AdditionalFMs>
   <Features>
     <Microsoft>
       <Feature>IOT_EFIESP</Feature>
       <Feature>IOT_EFIESP_BCD</Feature>
-      <!-- <Feature>IOT_DMAP_DRIVER</Feature> -->
+      <Feature>IOT_DISABLEBASICDISPLAYFALLBACK</Feature>
+      <Feature>IOT_HWN_CLASS_EXTENSION</Feature>
+      <Feature>IOT_USBFN_CLASS_EXTENSION</Feature>
       <Feature>IOT_CP210x_MAKERDRIVER</Feature>
       <Feature>IOT_FTSER2K_MAKERDRIVER</Feature>
-      <!-- <Feature>IOT_GENERIC_POP</Feature> -->
       <!-- Following two required for Appx Installation -->
       <Feature>IOT_UAP_OOBE</Feature>
       <Feature>IOT_APP_TOOLKIT</Feature>
-      <Feature>IOT_SPEECHDATA_EN_US</Feature>
       <!-- for Connectivity -->
       <!-- <Feature>IOT_SSH</Feature> -->
       <!-- <Feature>IOT_ENABLE_ADMIN</Feature> -->
     </Microsoft>
     <OEM>
       <!-- Include BSP Features -->
-      <Feature>QC_UEFI</Feature>
+      <Feature>QC_UEFI_PRODUCTION</Feature>
       <Feature>SBC</Feature>
       <Feature>QCDB410C_DEVICE_TARGETINGINFO</Feature>
       <Feature>QCDB410C_DEVICE_INFO</Feature>
