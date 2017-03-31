@@ -29,19 +29,13 @@ namespace Showcase
         {
             await AppServiceBridge.InitAsync();
             new TextToSpeech("Welcome").Play();
-            foreach (var pair in _voiceCallbacks)
-            {
-                _voiceCommand.AddCommand(pair.Key, pair.Value);
-            }
+            _voiceCommand.AddCommands(_voiceCallbacks);
             ContentNavigate(typeof(NewsAndWeather));
         }
 
         private void OnUnload(object sender, RoutedEventArgs e)
         {
-            foreach (var key in _voiceCallbacks.Keys)
-            {
-                _voiceCommand.RemoveCommand(key);
-            }
+            _voiceCommand.RemoveCommands(_voiceCallbacks);
         }
 
         private void ContentNavigate(Type page)

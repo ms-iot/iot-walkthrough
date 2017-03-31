@@ -37,16 +37,11 @@ namespace Showcase
             _commandCallback[command] = callback;
         }
 
-        public void AddCommand(KeyValuePair<string, RoutedEventHandler> pair)
-        {
-            AddCommand(pair.Key, pair.Value);
-        }
-
         public void AddCommands(Dictionary<string, RoutedEventHandler> commands)
         {
             foreach (var pair in commands)
             {
-                AddCommand(pair);
+                AddCommand(pair.Key, pair.Value);
             }
         }
 
@@ -98,7 +93,7 @@ namespace Showcase
                     Debug.WriteLine($"Recognition failed: {result.Status} - {result.Text}");
                     ShowHelp("Sorry, didn't catch that.");
                 }
-                else if (String.IsNullOrEmpty(result.Text) || result.Text == "Help")
+                else if (result.Text == "Help")
                 {
                     ShowHelp();
                 }
@@ -115,19 +110,7 @@ namespace Showcase
 
         private static void ShowHelp(string helpText = "")
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (var key in _commandCallback.Keys)
-            {
-                if (builder.Length == 0)
-                {
-                    builder.Append(key);
-                }
-                else
-                {
-                    builder.Append(", " + key);
-                }
-            }
-            new TextToSpeech($"{helpText} Choose one of {builder.ToString()}").Play();
+            new TextToSpeech($"{helpText} Choose one of {String.Join(", ", _commandCallback.Keys)}").Play();
         }
 
         private void InitGPIO()
@@ -136,6 +119,7 @@ namespace Showcase
 
             if (gpio == null)
             {
+                // If testing on Desktop, ignore LED/buttons.
                 Debug.WriteLine("No GPIO controller found");
                 return;
             }
@@ -153,9 +137,7 @@ namespace Showcase
         {
             if (sender.Read() == GpioPinValue.High)
             {
-                await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => {
-                    await RunVoiceRecognition();
-                });
+                await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => { await RunVoiceRecognition(); });
             }
         }
 
