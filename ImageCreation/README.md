@@ -143,7 +143,7 @@ The final manifest should look like:
 </OEMInput>
 ```
 
-Run `buildpkg all` to run the feature merger. Build the image with `buildimage Showcase Test` and your apps will show up after boot!
+Set the environment variable `BSPPKG_DIR` to point to the location with BSP packages (e.g. `set BSPPKG_DIR=C:\Program Files (x86)\Windows Kits\10\MSPackages\retail\arm\fre`). Run `buildpkg all` to run the feature merger. Build the image with `buildimage Showcase Test` and your apps will show up after boot!
 
 ## Updating apps
 
