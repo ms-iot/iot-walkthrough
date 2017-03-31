@@ -42,7 +42,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
     * [Integration with Bing news](Integrations/BingNews/README.md)
     * [Associating the app with the Windows Store](StoreDeployment/README.md)
-    * OneDrive picture slideshow
+    * [OneDrive picture slideshow](Integrations/OneDrive/README.md)
 7. Preparing for deployment
     * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
