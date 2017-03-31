@@ -27,9 +27,8 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Collecting sensor data through I2C](Background/Sensing/README.md)
 3. Foreground application
     * [Creating a foreground application](Foreground/Creating/README.md)
-    * Usage of text-to-speech
-    * Receiving voice commands
-    * Showing a slideshow
+    * [Usage of text-to-speech](Speech/TextToSpeech/README.md)
+    * [Receiving voice commands](Speech/VoiceCommands/README.md)
     * Playing media
 4. Inter-application communication
     * [Creating an app service](AppService/Creation/README.md)
@@ -43,7 +42,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
     * [Integration with Bing news](Integrations/BingNews/README.md)
     * [Associating the app with the Windows Store](StoreDeployment/README.md)
-    * Showing OneDrive pictures
+    * OneDrive picture slideshow
 7. Preparing for deployment
     * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
