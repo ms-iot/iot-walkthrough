@@ -38,7 +38,7 @@ Steps from implementation of apps to deployment are documented with an end-to-en
 5. Connecting to the Azure cloud
     * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution/README.md)
     * [Saving application keys on Azure](Azure/DeviceTwin/DesiredProperties/README.md)
-    * Synchronizing settings with Azure
+    * [Synchronizing settings with Azure](Azure/DeviceTwin/ReportedProperties/README.md)
 6. Integration with third-party services
     * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
     * [Integration with Bing news](Integrations/BingNews/README.md)
