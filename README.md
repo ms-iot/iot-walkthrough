@@ -27,10 +27,9 @@ Steps from implementation of apps to deployment are documented with an end-to-en
     * [Collecting sensor data through I2C](Background/Sensing/README.md)
 3. Foreground application
     * [Creating a foreground application](Foreground/Creating/README.md)
-    * Usage of text-to-speech
-    * Receiving voice commands
-    * Showing a slideshow
-    * Playing media
+    * [Usage of text-to-speech](Speech/TextToSpeech/README.md)
+    * [Receiving voice commands](Speech/VoiceCommands/README.md)
+    * [Playing media](Foreground/MediaPlayer/README.md)
 4. Inter-application communication
     * [Creating an app service](AppService/Creation/README.md)
     * [Communication between applications](AppService/Communication/README.md)
@@ -38,12 +37,12 @@ Steps from implementation of apps to deployment are documented with an end-to-en
 5. Connecting to the Azure cloud
     * [Connecting to an Azure IoT Hub using the Preconfigured Remote Monitoring solution](Azure/IoTHubPreconfiguredSolution/README.md)
     * [Saving application keys on Azure](Azure/DeviceTwin/DesiredProperties/README.md)
-    * Synchronizing settings with Azure
+    * [Synchronizing settings with Azure](Azure/DeviceTwin/ReportedProperties/README.md)
 6. Integration with third-party services
     * [Integration with OpenWeatherMap](Integrations/OpenWeatherMap/README.md)
-    * Integration with Bing news
+    * [Integration with Bing news](Integrations/BingNews/README.md)
     * [Associating the app with the Windows Store](StoreDeployment/README.md)
-    * Showing OneDrive pictures
+    * [OneDrive picture slideshow](Integrations/OneDrive/README.md)
 7. Preparing for deployment
     * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)

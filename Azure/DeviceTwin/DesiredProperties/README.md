@@ -83,7 +83,7 @@ We will create a console app to set the `bingKey` property in a set of devices. 
 
 ![Dashboard](Dashboard.png)
 
-![Iot Hub](IotHub.png)
+![IoT Hub](IoTHub.png)
 
 * Create a new console app by opening *File > New > Project > Templates > Visual C# > Console Application*.
 * Right click the project, choose *Manage NuGet Packages...* and install the *Microsoft.Azure.Devices* package.

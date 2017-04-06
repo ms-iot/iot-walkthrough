@@ -55,9 +55,17 @@ namespace ShowcaseAppService
 Reload the project (*Right click -> Reload Project*). Find the Package Family Name (PFN) of your background app package. You can find it by one of the following:
 
 1. If you app is associated with the Store, [see this guide to find it on the app registration page](../../StoreDeployment/README.md).
-2. Deploy the app and see the PFN on the Build Output window:
+2. Deploy the app and see the full package name on the Build Output window or run `DeployAppx getpackages` to see a list of installed full package names. To get the PFN, remove the version and platform information from the full package name:
 ![PFN build output](PFNBuildOutput.png)
 3. Write the value of `Windows.ApplicationModel.Package.Current.Id.FamilyName` to debug output and take note of it.
+4. Run `DeployAppx getpackageid <Path to appx>` to list the package name, package family name and full name:
+```
+         Package Name: 19434DeveloperId.devex-showcase
+  Package Family Name: 19434DeveloperId.devex-showcase_gr440wvt0bh62
+    Package Full Name: 19434DeveloperId.devex-showcase_1.1.1.0_arm__gr440wvt0bh62
+```
+5. Using the API to parse an appx's manifest. This option is interesting if you need to programmatically extract package information. [See this sample for more information.](https://msdn.microsoft.com/en-us/library/windows/desktop/hh446622&#40;v=vs.85&#41;.aspx)
+
 
 * Create a `AppServiceConnectionFactory` class. It will return connections to the app service. You will connect to a given app service in a PFN:
 

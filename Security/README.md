@@ -36,6 +36,7 @@ To generate the certificates:
 
 ## Enabling SecureBoot/BitLocker/ConfigCI
 **TODO: Public instructions and link to cab package to enable these features should be released by end of 1703. Update this page once it happens.**
+To enable these features, [follow the instructions at this page](https://developer.microsoft.com/en-us/windows/iot/docs/securebootandbitlocker).
 
 ## Adding trusted OEM certificates
 **TODO: Public instructions at end of 1703**

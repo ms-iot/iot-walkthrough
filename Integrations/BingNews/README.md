@@ -16,7 +16,7 @@ We will have a very simple model class to represent a news item. We are interest
 
 ## Bing API
 
-Bing provides a few APIs to fetch news. We will be using the *Category News* API, which receives a category and region and returns a list of news, due to its simplicity. It also has APIs for Trending Topics and a Search API, which receives a search query and returns the results. [Check the Cognitive Services documentation for more information.](https://dev.cognitive.microsoft.com/docs/services/56b43f72cf5ff8098cef380a/operations/56f02400dbe2d91900c68553)
+Bing provides a few APIs to fetch news. We will be using the *Category News* API, which receives a category and region and returns a list of news, due to its simplicity. It also has APIs for Trending Topics and a Search API, which receives a search query and returns the results; if you want search results on a specific item, the Search API might be more appropriate. [Check the Cognitive Services documentation for more information.](https://dev.cognitive.microsoft.com/docs/services/56b43f72cf5ff8098cef380a/operations/56f02400dbe2d91900c68553)
 
 First, [open the cognitive services subscription page and create a free subscription](https://www.microsoft.com/cognitive-services/en-US/subscriptions). Click *Subscribe to new free trials >* Check *Bing Search - Free >* check *I agree to the Microsoft Cognitive Services Terms and Microsoft Privacy Statement > Subscribe*. The free quota allows for 5 transactions per second and 1000 per month. A plan can be purchased on Azure if more calls are desired.
 
@@ -55,7 +55,7 @@ class BingNews
 }
 ```
 
-Then, (`HttpHelper.TryGetJsonAsync`)[https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/HttpHelper.cs] can be used to parse the JSON response. An `EventHandler` will be called whenever the news are updated:
+Then, [`HttpHelper.TryGetJsonAsync`](https://github.com/ms-iot/iot-walkthrough/blob/master/CS/Showcase/HttpHelper.cs) can be used to parse the JSON response. An `EventHandler` will be called whenever the news are updated:
 
 ```cs
 public class NewsUpdateEventArgs : EventArgs
