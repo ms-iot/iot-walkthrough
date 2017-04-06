@@ -29,23 +29,24 @@ namespace Showcase
         {
             this.InitializeComponent();
             uiThreadDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-
-            _bing.NewsUpdate += NewsUpdate;
-            _bing.Start();
-
-            _weather.WeatherUpdate += WeatherUpdate;
-            _weather.Start();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            _bing.NewsUpdate += NewsUpdate;
+            _bing.Start();
+            _weather.WeatherUpdate += WeatherUpdate;
+            _weather.Start();
             AppServiceBridge.RequestReceived += PropertyUpdate;
             AppServiceBridge.RequestUpdate(new List<string> { "ConfigTemperatureUnit", "temperature", "humidity", "pressure" });
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            _bing.NewsUpdate -= NewsUpdate;
             _bing.Stop();
+
+            _weather.WeatherUpdate -= WeatherUpdate;
             _weather.Stop();
             AppServiceBridge.RequestReceived -= PropertyUpdate;
         }

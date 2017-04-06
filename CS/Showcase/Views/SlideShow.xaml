@@ -16,19 +16,19 @@
                     x:Name="FadeAnimation"
                     Storyboard.TargetName="ForegroundImage"
                     Storyboard.TargetProperty="Opacity"
-                    From="1.0" To="0.0" Duration="0:0:3" />
+                    From="1.0" To="0.0" Duration="0:0:2" />
                 <DoubleAnimation
                     x:Name="ForegroundFadeAnimation"
                     Storyboard.TargetName="ForegroundImageGrid"
                     Storyboard.TargetProperty="Opacity"
-                    From="1.0" To="0.0" Duration="0:0:3" />
+                    From="1.0" To="0.0" Duration="0:0:2" />
             </Storyboard>
         </RelativePanel.Resources>
         <Image x:Name="BackgroundImage" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <Grid Name="ForegroundImageGrid" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True">
             <Image x:Name="ForegroundImage" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
-        <TextBlock Name="ErrorTextBlock" Margin="50,50,50,50" Foreground="#FFaaaaaa" />
+        <TextBlock Name="ErrorTextBlock" Margin="50,50,50,50" Foreground="#ffaaaaaa" />
         <Grid Name="SlideShowControls" RelativePanel.AlignBottomWithPanel="True" Margin="20,20,20,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -41,21 +41,21 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button Grid.Column="0" Name="PlayPauseButton" FontFamily="Segoe MDL2 Assets" Content="&#xE769;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="Toggle_Click"/>
-            <Button Grid.Column="1" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="Previous_Click"/>
-            <Button Grid.Column="2" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="Next_Click"/>
-            <Button Grid.Column="3" Name="SetTime" FontFamily="Segoe MDL2 Assets" Content="&#xE916;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="SetTime_Click"/>
+            <Button Grid.Column="0" Name="PlayPauseButton" FontFamily="Segoe MDL2 Assets" Content="&#xE769;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="Toggle_Click"/>
+            <Button Grid.Column="1" FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="Previous_Click"/>
+            <Button Grid.Column="2" FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="Next_Click"/>
+            <Button Grid.Column="3" Name="SetTime" FontFamily="Segoe MDL2 Assets" Content="&#xE916;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="SetTime_Click"/>
             <Popup Grid.Column="3" Name="SetTimePopup" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsLightDismissEnabled="True" VerticalOffset="-150">
                 <ListView Background="White" BorderThickness="2.0" IsItemClickEnabled="True" IsTabStop="True" ItemClick="SetTimePopup_ItemClick">
                     <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Height="40" Margin="0,5,0,5">
-                        <TextBlock Text="Faster image switch" VerticalAlignment="Center" Margin="20,0,20,0" />
+                        <TextBlock Text="Slower transition" VerticalAlignment="Center" Margin="20,0,20,0" />
                     </ListViewItem>
                     <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Height="40" Margin="0,5,0,5">
                         <TextBlock Text="Faster transition" Margin="20,0,20,0" />
                     </ListViewItem>
                 </ListView>
             </Popup>
-            <Button Grid.Column="4" FontFamily="Segoe MDL2 Assets" Content="&#xECE8;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="SetStretchType_Click"/>
+            <Button Grid.Column="4" FontFamily="Segoe MDL2 Assets" Content="&#xECE8;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="SetStretchType_Click"/>
             <Popup Grid.Column="4" Name="SetStretchTypePopup" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsLightDismissEnabled="True" VerticalOffset="-264">
                 <ListView Background="White" BorderThickness="2.0" IsItemClickEnabled="True" IsTabStop="True" ItemClick="SetStretchTypePopup_ItemClick">
                     <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Height="40" Margin="0,5,0,5">
@@ -72,7 +72,7 @@
                     </ListViewItem>
                 </ListView>
             </Popup>
-            <Button Grid.Column="5" FontFamily="Segoe MDL2 Assets" Content="&#xEF1F;" Width="40" Height="40" Background="Transparent" Foreground="#90999999" Click="ToggleBackground_Click"/>
+            <Button Grid.Column="5" FontFamily="Segoe MDL2 Assets" Content="&#xEF1F;" Width="40" Height="40" Background="Transparent" Foreground="#cc999999" Click="ToggleBackground_Click"/>
         </Grid>
     </RelativePanel>
 </Page>

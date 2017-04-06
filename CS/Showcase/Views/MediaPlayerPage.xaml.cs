@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;

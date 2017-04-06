@@ -18,12 +18,12 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <GridView Name="ListView" ItemsSource="{x:Bind NewsGrid}" ItemClick="News_ItemClick" IsItemClickEnabled="True" Grid.Row="0" Grid.ColumnSpan="2">
+        <GridView ItemsSource="{x:Bind NewsGrid}" ItemClick="News_ItemClick" IsItemClickEnabled="True" Grid.Row="0" Grid.ColumnSpan="2">
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="120" Height="180" Margin="5,5,5,5">
-                        <Image Width="100" Height="100" Source="{Binding Thumbnail.Source}" Margin="10,10,10,10" />
-                        <TextBlock Width="120" Height="60" Text="{Binding Name}" TextWrapping="WrapWholeWords" RelativePanel.AlignBottomWithPanel="False" />
+                        <Image Width="100" Height="100" Source="{Binding Thumbnail}" Margin="10,10,10,10" />
+                        <TextBlock Width="120" Height="60" Text="{Binding Name}" TextWrapping="WrapWholeWords" />
                     </StackPanel>
                 </DataTemplate>
             </GridView.ItemTemplate>
