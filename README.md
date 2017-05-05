@@ -46,6 +46,6 @@ Steps from implementation of apps to deployment are documented with an end-to-en
 7. Preparing for deployment
     * [Enabling Secure Boot, BitLocker and ConfigCI](Security/README.md)
     * [Saving Azure keys to the TPM module and connecting with tokens](Security/TPM/README.md)
-    * [IoT image creation](ImageCreation/README.md)
+    * IoT image creation
 8. Deployment
-    * [Creating a retail OEM image](ImageCreation/Retail/README.md)
+    * Creating a retail OEM image
