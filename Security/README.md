@@ -27,23 +27,13 @@ If SecureBoot was enabled on the board previously, it is recommended to reset th
     * *Clear UEFI RT Variables and fTPM (Erase RPMB)*
 
 ## Getting certificates
-Follow the [instructions on this page](https://developer.microsoft.com/en-us/windows/iot/Docs/SecureBootAndBitLocker.htm#Certificates) to generate certificates and private keys. Alternatively, for testing purposes, [pre-generated certificates](https://github.com/ms-iot/security/tree/master/PreGenPackage) can be used; however, they are **NOT** secure for production deployments.
+Follow the [instructions on this page](https://developer.microsoft.com/en-us/windows/iot/Docs/TurnkeySecurity.htm) to generate certificates and private keys. 
 
-To generate the certificates:
+Alternatively, for testing purposes, [pre-generated certificates](https://github.com/ms-iot/security/tree/master/PreGenPackage) can be used; however, they are **NOT** secure for production deployments.
+
 * Download the files [from this folder](https://github.com/ms-iot/security/tree/master/CertGen). Run the **MakeSB.ps1** script in an administrative PowerShell console.
     * You might need to [set the PowerShell execution policy to a less restricted value](https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.security/set-executionpolicy).
     * The script assumes a x64 PC with the Windows Developer Kit tools for **Windows 8.1 or newer** installed to `C:\Program Files (x86)\Windows Kits\10\bin\x64\`. Edit the script if this is not the case.
 
 ## Enabling SecureBoot/BitLocker/ConfigCI
-**TODO: Public instructions and link to cab package to enable these features should be released by end of 1703. Update this page once it happens.**
-To enable these features, [follow the instructions at this page](https://developer.microsoft.com/en-us/windows/iot/docs/securebootandbitlocker).
-
-## Adding trusted OEM certificates
-**TODO: Public instructions at end of 1703**
-
-## Signing APPX packages
-To sign an APPX package with your pfx key, run:
-
-`signtool.exe sign /fd SHA256 /a /f <path to pfx file> .\Showcase_<version>_ARM_Debug.appx`
-
-To sign the appx before image deployment, run the command in directory `C:\IoT-ADK-AddonKit\Source-arm\Packages\Appx.Showcase\AppInstall` after building the package and before building the image. [If you find any error during the procedure, see this page for information on debugging.](https://msdn.microsoft.com/en-us/library/windows/desktop/jj835836(v=vs.85).aspx)
+To enable these features, [follow the instructions at this page](https://developer.microsoft.com/en-us/windows/iot/Docs/TurnkeySecurity.htm).
