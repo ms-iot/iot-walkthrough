@@ -60,7 +60,7 @@ namespace BackgroundWeatherStation
 To run this code on a device:
 * Choose *Remote Machine* as the target of deployment using the menu bar of Visual Studio.
 ![Changing to remote machine](ChangingToRemoteMachine.png)
-* Pick you device from the list (or enter it's IP address manually).
+* Pick you device from the list (or enter its IP address manually).
 * Run through the menu bar (or press F5).
 
 The message should be printed on the output window every 5 seconds:
