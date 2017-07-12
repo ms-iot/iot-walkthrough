@@ -65,7 +65,7 @@ class VoiceCommand
 }
 ```
 
-To enable the LED during voice recognition, call `SetLet`:
+To enable the LED during voice recognition, call `SetLed`:
 
 ```cs
 class VoiceCommand
