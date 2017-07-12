@@ -32,7 +32,7 @@ private void ContentNavigate(Type page)
 }
 ```
 
-* Now, it's just a matter of creating the callbacks for button presses and call `ContentNavigate` with the target page. For example, to navigate to the `SlideShow` when the button is pressed, do:
+* Now, it's just a matter of creating the callbacks for button presses that call `ContentNavigate` with the target page. For example, to navigate to the `SlideShow` when the button is pressed, do:
 
 ```cs
 private void SlideShow_Click(object sender, RoutedEventArgs e)
@@ -41,7 +41,7 @@ private void SlideShow_Click(object sender, RoutedEventArgs e)
 }
 ```
 
-* A [Hamburguer Button]() allows the user to show or collapse the panel. The code for the button click is:
+* A hamburger button allows the user to show or collapse the panel. The code for the button click is:
 
 ```cs
 private void PanelToggle_Click(object sender, RoutedEventArgs e)
