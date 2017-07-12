@@ -22,12 +22,12 @@ On the dialog, choose a *Visual C# Class* and name it *WeatherStation*.
 
 ## Reading pressure data
 
-The will use the pressure data provided by the MPL3315A2. Following the datasheet, we must:
+We will use the pressure data provided by the MPL3315A2. Following the datasheet, we must:
 
 * Set the control register *CTRL_REG1* to an appropriate value depending on the desired measurement mode.
 * Read and convert the pressure.
 
-Furthermore, the sensor has a *WHO_AM_I* register for device identification. It's good practice to verify it's value before trying to use the sensor.
+Furthermore, the sensor has a *WHO_AM_I* register for device identification. It's good practice to verify its value before trying to use the sensor.
 
 We'll start the *WeatherStation* with a few definitions from the datasheet and a function to initialize the sensors. It is assumed that the weather station is connected to the default I2C bus.
 
@@ -156,7 +156,7 @@ public double ReadPressure()
 
 ## Reading temperature and humidity data
 
-The HTU21D sensor is very easy to use and doesn't require special setup. Reading the registers for temperature and pressure data will trigger a measurement and return it's value. The following definitions cover the registers that we'll be using:
+The HTU21D sensor is very easy to use and doesn't require special setup. Reading the registers for temperature and pressure data will trigger a measurement and return its value. The following definitions cover the registers that we'll be using:
 
 ```cs
 private abstract class Htu21dDefinitions
