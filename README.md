@@ -1,5 +1,6 @@
 
 # Windows 10 IoTCore Walkthrough
+View the walkthrough here: https://ms-iot.github.io/iot-walkthrough/ 
 
 ## Introduction
 
