@@ -41,7 +41,7 @@ private void SlideShow_Click(object sender, RoutedEventArgs e)
 }
 ```
 
-* A [Hamburguer Button]() allows the user to show or collapse the panel. The code for the button click is:
+* A [Hamburger Button]() allows the user to show or collapse the panel. The code for the button click is:
 
 ```cs
 private void PanelToggle_Click(object sender, RoutedEventArgs e)
